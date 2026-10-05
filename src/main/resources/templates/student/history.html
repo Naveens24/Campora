@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('History')}"></head>
+<body class="role-student">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+  <div class="page-head">
+    <div class="kicker">Student · History</div>
+    <h1>Your journeys</h1>
+  </div>
+
+  <section class="card-c mb-4">
+    <div class="card-title-c mb-3">Rides</div>
+    <div class="empty" th:if="${#lists.isEmpty(journeys)}"><i class="bi bi-signpost"></i>No rides yet.</div>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(journeys)}">
+      <table class="table table-c">
+        <thead><tr><th>When</th><th>Mode</th><th>Route</th><th>With</th><th>Seats</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr th:each="j : ${journeys}">
+            <td class="text-nowrap" th:text="${@fmt.when(j.when())}">time</td>
+            <td><span class="pill" th:classappend="${#strings.toLowerCase(j.kind())}" th:text="${j.kind()}">AUTO</span></td>
+            <td th:text="${j.pickup()} + ' → ' + ${j.destination()}">route</td>
+            <td th:text="${j.counterpart()}">driver</td>
+            <td th:text="${j.seats()}">1</td>
+            <td><span class="pill" th:classappend="${#strings.toLowerCase(j.status())}" th:text="${j.status()}">DONE</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card-c">
+    <div class="card-title-c mb-3">Requests</div>
+    <div class="empty" th:if="${#lists.isEmpty(requests)}"><i class="bi bi-list-task"></i>No requests yet.</div>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(requests)}">
+      <table class="table table-c">
+        <thead><tr><th>Raised</th><th>Route</th><th>Type</th><th>Seats</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr th:each="r : ${requests}">
+            <td class="text-nowrap" th:text="${@fmt.when(r.createdAt())}">time</td>
+            <td th:text="${r.pickup()} + ' → ' + ${r.destination()}">route</td>
+            <td th:text="${r.type().label}">Any</td>
+            <td th:text="${r.seats()}">1</td>
+            <td><span class="pill" th:classappend="${#strings.toLowerCase(r.status().name())}" th:text="${@fmt.label(r.status())}">Open</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

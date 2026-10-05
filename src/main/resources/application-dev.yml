@@ -1,0 +1,25 @@
+# Development profile — zero setup. File-based H2 in PostgreSQL mode,
+# demo data seeded on first start, OTP shown on screen.
+spring:
+  datasource:
+    url: jdbc:h2:file:./data/campora-dev;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE
+    username: sa
+    password:
+  thymeleaf:
+    cache: false
+  web:
+    resources:
+      cache:
+        cachecontrol:
+          max-age: 0
+
+campora:
+  seed-demo-data: true
+  otp:
+    expose-in-ui: true
+  mobility:
+    request-ttl: PT4H          # long TTL so the demo hotspots stay alive
+
+logging:
+  level:
+    in.ggv.campora: DEBUG

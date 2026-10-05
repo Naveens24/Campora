@@ -1,0 +1,26 @@
+# Production profile — PostgreSQL. Supply credentials via environment:
+#   DB_URL=jdbc:postgresql://localhost:5432/campora  DB_USER=campora  DB_PASSWORD=...
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/campora}
+    username: ${DB_USER:campora}
+    password: ${DB_PASSWORD:campora}
+    hikari:
+      maximum-pool-size: ${DB_POOL_SIZE:10}
+      minimum-idle: 2
+      connection-timeout: 5000
+      max-lifetime: 1800000
+
+server:
+  servlet:
+    session:
+      cookie:
+        secure: ${COOKIE_SECURE:true}
+  forward-headers-strategy: native
+
+campora:
+  seed-demo-data: ${SEED_DEMO_DATA:false}
+
+logging:
+  level:
+    root: INFO

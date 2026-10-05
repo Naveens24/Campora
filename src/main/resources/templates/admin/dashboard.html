@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Control room')}"></head>
+<body class="role-admin">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+  <div class="page-head">
+    <div class="kicker">Transport office · Control room</div>
+    <h1>Network overview</h1>
+    <p>Verify drivers, review stop suggestions and manage the stop network.</p>
+  </div>
+
+  <!-- ── Stats ─────────────────────────────────────────────── -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.openRequests()}">0</div><div class="k">Open requests</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.activeTrips()}">0</div><div class="k">Active trips</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.tripsCompletedToday()}">0</div><div class="k">Trips done today</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.activeCompanionRides()}">0</div><div class="k">Companion rides</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.driversOnline()} + '/' + ${stats.drivers()}">0</div><div class="k">Drivers online</div></div></div>
+    <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.students()}">0</div><div class="k">Students</div></div></div>
+  </div>
+
+  <div class="row g-3 mb-4" th:if="${stats.driversAwaitingVerification() > 0 or stats.pendingSuggestions() > 0}">
+    <div class="col-md-6" th:if="${stats.driversAwaitingVerification() > 0}">
+      <a class="stat alert d-flex gap-3 align-items-center text-decoration-none" href="#drivers">
+        <span class="icon-badge trip"><i class="bi bi-person-badge"></i></span>
+        <span><span class="v d-block" th:text="${stats.driversAwaitingVerification()}">1</span><span class="k d-block">Drivers awaiting verification</span></span>
+      </a>
+    </div>
+    <div class="col-md-6" th:if="${stats.pendingSuggestions() > 0}">
+      <a class="stat alert d-flex gap-3 align-items-center text-decoration-none" href="#suggestions">
+        <span class="icon-badge trip"><i class="bi bi-pin-map"></i></span>
+        <span><span class="v d-block" th:text="${stats.pendingSuggestions()}">1</span><span class="k d-block">Stop suggestions to review</span></span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── Drivers ───────────────────────────────────────────── -->
+  <section class="card-c mb-4" id="drivers">
+    <div class="card-title-c mb-3">Drivers</div>
+    <div class="empty" th:if="${#lists.isEmpty(drivers)}"><i class="bi bi-truck-front"></i>No drivers registered yet.</div>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(drivers)}">
+      <table class="table table-c">
+        <thead><tr><th>Driver</th><th>Vehicle</th><th>Seats</th><th>Area</th><th>Status</th><th class="text-end">Action</th></tr></thead>
+        <tbody>
+          <tr th:each="d : ${drivers}">
+            <td><div class="fw-semibold text-body" th:text="${d.name()}">Name</div><div class="small mono text-ink-3" th:text="${d.mobile()}">98</div></td>
+            <td><div th:text="${d.vehicle()}">Auto</div><div class="small mono text-ink-3" th:text="${d.vehicleNumber()}">CG</div></td>
+            <td th:text="${d.capacity()}">5</td>
+            <td th:text="${d.nativeArea() ?: '—'}">Area</td>
+            <td>
+              <span class="pill" th:if="${!d.verified()}">Unverified</span>
+              <span class="pill matched" th:if="${d.verified()}" th:text="${d.availability().name() == 'ONLINE'} ? 'Verified · online' : 'Verified'">Verified</span>
+            </td>
+            <td class="text-end">
+              <form th:if="${!d.verified()}" th:action="@{/admin/drivers/{id}/verify(id=${d.id()})}" method="post" class="d-inline">
+                <button type="submit" class="btn btn-sm btn-route btn-driver"><i class="bi bi-patch-check me-1"></i>Verify</button>
+              </form>
+              <form th:if="${d.verified()}" th:action="@{/admin/drivers/{id}/revoke(id=${d.id()})}" method="post" class="d-inline"
+                    data-confirm="Revoke this driver's verification?">
+                <button type="submit" class="btn btn-sm btn-ghost">Revoke</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── Suggestions ───────────────────────────────────────── -->
+  <section class="card-c mb-4" id="suggestions">
+    <div class="card-title-c mb-3">Stop suggestions</div>
+    <div class="empty" th:if="${#lists.isEmpty(suggestions)}"><i class="bi bi-inbox"></i>Nothing to review.</div>
+    <div class="py-3 border-top" th:each="s : ${suggestions}">
+      <div class="d-flex flex-wrap justify-content-between gap-3">
+        <div>
+          <div class="fw-semibold text-body" th:text="${s.proposedName()}">Place</div>
+          <div class="small text-ink-3"><span th:text="${s.area() ?: 'No area given'}">area</span> · by <span th:text="${s.studentName()}">student</span> · <span th:text="${@fmt.ago(s.createdAt())}">ago</span></div>
+          <div class="small mt-1" th:if="${s.reason() != null}" th:text="'“' + ${s.reason()} + '”'">reason</div>
+        </div>
+        <div class="d-flex flex-wrap gap-2 align-items-start">
+          <form th:action="@{/admin/suggestions/{id}/approve(id=${s.id()})}" method="post" class="d-flex gap-2">
+            <select class="form-select form-select-sm" name="type" aria-label="Stop type">
+              <option th:each="t : ${locationTypes}" th:value="${t}" th:text="${@fmt.label(t)}" th:selected="${t.name() == 'CITY'}">City</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-route btn-driver">Approve</button>
+          </form>
+          <form th:action="@{/admin/suggestions/{id}/reject(id=${s.id()})}" method="post" class="d-flex gap-2">
+            <input class="form-control form-control-sm" name="note" placeholder="Reason (optional)" maxlength="300">
+            <button type="submit" class="btn btn-sm btn-ghost">Reject</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="row g-4">
+    <!-- ── Stop network ─────────────────────────────────────── -->
+    <div class="col-lg-7">
+      <section class="card-c h-100" id="network">
+        <div class="card-title-c mb-3">Stop network</div>
+        <form th:action="@{/admin/locations}" th:object="${locationForm}" method="post" class="row g-2 mb-3">
+          <div class="col-sm-4"><input class="form-control form-control-sm" th:field="*{name}" placeholder="Stop name" required></div>
+          <div class="col-sm-4"><input class="form-control form-control-sm" th:field="*{area}" placeholder="Area"></div>
+          <div class="col-6 col-sm-2">
+            <select class="form-select form-select-sm" th:field="*{type}">
+              <option th:each="t : ${locationTypes}" th:value="${t}" th:text="${t.name() == 'CITY'} ? 'City' : 'Campus'">City</option>
+            </select>
+          </div>
+          <div class="col-6 col-sm-2"><button type="submit" class="btn btn-sm btn-route w-100">Add</button></div>
+        </form>
+        <div class="table-responsive" style="max-height: 420px">
+          <table class="table table-c table-sm">
+            <thead><tr><th>Stop</th><th>Type</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              <tr th:each="l : ${locations}">
+                <td><span class="fw-semibold text-body" th:text="${l.name()}">Stop</span>
+                  <span class="small text-ink-3 d-block" th:if="${l.area() != null}" th:text="${l.area()}">area</span></td>
+                <td><span class="pill" th:classappend="${l.onCampus()} ? 'open' : 'hosted'" th:text="${l.onCampus()} ? 'Campus' : 'City'">City</span></td>
+                <td th:text="${l.active()} ? 'In service' : 'Paused'">In service</td>
+                <td class="text-end">
+                  <form th:action="@{/admin/locations/{id}/toggle(id=${l.id()})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-ghost" th:text="${l.active()} ? 'Pause' : 'Resume'">Pause</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- ── Departments ──────────────────────────────────────── -->
+    <div class="col-lg-5">
+      <section class="card-c h-100" id="departments">
+        <div class="card-title-c mb-3">Departments</div>
+        <form th:action="@{/admin/departments}" th:object="${departmentForm}" method="post" class="row g-2 mb-3">
+          <div class="col-4"><input class="form-control form-control-sm mono text-uppercase" th:field="*{code}" placeholder="CODE" required></div>
+          <div class="col-5"><input class="form-control form-control-sm" th:field="*{name}" placeholder="Department name" required></div>
+          <div class="col-3"><button type="submit" class="btn btn-sm btn-route w-100">Add</button></div>
+        </form>
+        <div class="table-responsive" style="max-height: 420px">
+          <table class="table table-c table-sm">
+            <tbody>
+              <tr th:each="d : ${departments}">
+                <td class="mono small" th:text="${d.code()}">MCA</td>
+                <td th:text="${d.name()}" th:classappend="${!d.active()} ? 'text-ink-3 text-decoration-line-through'">Name</td>
+                <td class="text-end">
+                  <form th:action="@{/admin/departments/{id}/toggle(id=${d.id()})}" method="post">
+                    <button type="submit" class="btn btn-sm btn-ghost" th:text="${d.active()} ? 'Pause' : 'Resume'">Pause</button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

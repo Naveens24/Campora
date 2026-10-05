@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!--
+  Shared page chrome. Usage in a page:
+    <head th:replace="~{fragments/layout :: head('Title')}"></head>
+    <nav th:replace="~{fragments/layout :: nav}"></nav>
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+-->
+
+<head th:fragment="head(title)">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Campora — demand-oriented campus mobility for Guru Ghasidas Vishwavidyalaya.">
+  <meta name="theme-color" content="#0B1220">
+  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
+  <meta name="_csrf_parameter" th:if="${_csrf != null}" th:content="${_csrf.parameterName}">
+  <title th:text="${title} + ' · Campora'">Campora</title>
+  <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.3/dist/css/bootstrap.min.css}">
+  <link rel="stylesheet" th:href="@{/webjars/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css}">
+  <link rel="stylesheet" th:href="@{/css/campora.css}">
+</head>
+
+<body>
+
+<nav th:fragment="nav" class="navbar navbar-expand-lg topbar" aria-label="Main">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">
+      <img th:src="@{/img/logo.svg}" alt="" width="30" height="30"> Campora
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+            aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <ul class="navbar-nav me-auto ms-lg-3" th:if="${me != null and me.ready()}">
+        <th:block th:if="${me.isStudent()}">
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/student'} ? 'active'" th:href="@{/student}"><i class="bi bi-geo-alt me-1"></i>Ride</a></li>
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/companion'} ? 'active'" th:href="@{/companion}"><i class="bi bi-people me-1"></i>Companion</a></li>
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/student/history'} ? 'active'" th:href="@{/student/history}"><i class="bi bi-clock-history me-1"></i>History</a></li>
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/student/suggest'} ? 'active'" th:href="@{/student/suggest}"><i class="bi bi-pin-map me-1"></i>Suggest a stop</a></li>
+        </th:block>
+        <th:block th:if="${me.isDriver()}">
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver'} ? 'active'" th:href="@{/driver}"><i class="bi bi-broadcast me-1"></i>Live demand</a></li>
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver/history'} ? 'active'" th:href="@{/driver/history}"><i class="bi bi-clock-history me-1"></i>Trips</a></li>
+        </th:block>
+        <th:block th:if="${me.isAdmin()}">
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/admin'} ? 'active'" th:href="@{/admin}"><i class="bi bi-speedometer2 me-1"></i>Control room</a></li>
+        </th:block>
+      </ul>
+      <ul class="navbar-nav me-auto" th:unless="${me != null and me.ready()}"></ul>
+
+      <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0" th:if="${me != null}">
+        <span class="user-chip">
+          <span class="role-dot"></span>
+          <span th:text="${me.fullName()}">Name</span>
+          <span class="role-tag" th:if="${me.role() != null}" th:text="${me.role().name()}">ROLE</span>
+        </span>
+        <form th:action="@{/logout}" method="post" class="m-0">
+          <button type="submit" class="btn btn-sm btn-outline-light"><i class="bi bi-box-arrow-right me-1"></i>Sign out</button>
+        </form>
+      </div>
+      <div class="d-flex gap-2 mt-3 mt-lg-0" th:if="${me == null}">
+        <a class="btn btn-sm btn-outline-light" th:href="@{/login}">Sign in</a>
+        <a class="btn btn-sm btn-light" th:href="@{/register}">Create account</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div th:fragment="flash" class="flash-stack">
+  <div class="alert alert-success flash" role="status" th:if="${success != null}">
+    <i class="bi bi-check-circle-fill"></i><div th:text="${success}">Done</div>
+  </div>
+  <div class="alert alert-danger flash" role="alert" th:if="${error != null}">
+    <i class="bi bi-exclamation-triangle-fill"></i><div th:text="${error}">Error</div>
+  </div>
+  <div class="alert alert-info flash" role="note" th:if="${devOtp != null}">
+    <i class="bi bi-code-slash"></i>
+    <div>Dev mode — your OTP is <strong class="mono" th:text="${devOtp}">000000</strong>
+      <span class="small d-block">It is also printed in the server log. Disable with <code>campora.otp.expose-in-ui=false</code>.</span></div>
+  </div>
+</div>
+
+<footer th:fragment="footer" class="site-footer">
+  <div class="container d-flex flex-wrap justify-content-between gap-2">
+    <span><strong class="text-body">Campora</strong> · Demand-oriented campus mobility</span>
+    <span class="mono small">Guru Ghasidas Vishwavidyalaya · MCA Project</span>
+  </div>
+</footer>
+
+<th:block th:fragment="scripts">
+  <script th:src="@{/webjars/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js}" defer></script>
+  <script th:src="@{/js/campora.js}" defer></script>
+</th:block>
+
+<!-- Reusable: pickup ●━━● destination -->
+<div th:fragment="route(from, to)" class="route">
+  <div class="stop"><i class="pin"></i><span th:text="${from}">From</span></div>
+  <div class="track"></div>
+  <div class="stop"><i class="pin end"></i><span th:text="${to}">To</span></div>
+</div>
+
+<!-- Reusable: grouped stop <select> options -->
+<th:block th:fragment="stopOptions(locations)">
+  <optgroup label="On campus">
+    <option th:each="l : ${locations}" th:if="${l.onCampus()}" th:value="${l.id()}" th:text="${l.name()}">Stop</option>
+  </optgroup>
+  <optgroup label="In the city">
+    <option th:each="l : ${locations}" th:unless="${l.onCampus()}" th:value="${l.id()}"
+            th:text="${l.area() != null ? l.name() + ' — ' + l.area() : l.name()}">Stop</option>
+  </optgroup>
+</th:block>
+
+</body>
+</html>

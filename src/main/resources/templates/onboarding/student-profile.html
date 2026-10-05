@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Student profile')}"></head>
+<body class="role-student">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container">
+  <div class="auth-wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="card-c accent">
+      <div class="kicker">Almost there · Student profile</div>
+      <h1 class="h3 mb-4">Tell us about your studies</h1>
+      <form th:action="@{/onboarding/profile/student}" th:object="${form}" method="post" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="departmentId">Department</label>
+          <select class="form-select" th:field="*{departmentId}" th:errorclass="is-invalid" required>
+            <option value="">Choose…</option>
+            <option th:each="d : ${departments}" th:value="${d.id()}" th:text="${d.name()}">Dept</option>
+          </select>
+          <div class="invalid-feedback" th:errors="*{departmentId}"></div>
+        </div>
+        <div class="row g-3 mb-4">
+          <div class="col-7">
+            <label class="form-label" for="enrollmentNo">Enrollment no.</label>
+            <input class="form-control mono" th:field="*{enrollmentNo}" th:errorclass="is-invalid" placeholder="GGV/24/1234" required>
+            <div class="invalid-feedback" th:errors="*{enrollmentNo}"></div>
+          </div>
+          <div class="col-5">
+            <label class="form-label" for="semester">Semester</label>
+            <input class="form-control" th:field="*{semester}" th:errorclass="is-invalid" type="number" min="1" max="12" required>
+            <div class="invalid-feedback" th:errors="*{semester}"></div>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-route w-100 py-2">Finish setup <i class="bi bi-check2 ms-1"></i></button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

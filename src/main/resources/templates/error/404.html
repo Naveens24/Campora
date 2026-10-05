@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Not found')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-5">
+  <div class="auth-wrap text-center">
+    <div class="card-c accent">
+      <span class="icon-badge mb-3"><i class="bi bi-signpost-2"></i></span>
+      <div class="kicker">404 · Wrong turn</div>
+      <h1 class="h3">This stop isn't on the map</h1>
+      <p class="text-ink-3">The page or record you're looking for doesn't exist, or isn't yours to see.</p>
+      <a class="btn btn-route" th:href="@{/dashboard}">Back to my dashboard</a>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

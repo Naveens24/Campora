@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Companion rides')}"></head>
+<body class="role-companion">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+  <div class="page-head">
+    <div class="kicker">Student · Companion</div>
+    <h1>Share the ride</h1>
+    <p>Got a scooty or car? Offer your spare seats. Need a lift? Join a classmate going your way.</p>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+
+      <!-- ── Hosting ──────────────────────────────────────── -->
+      <section class="card-c accent" th:if="${hostedRide != null}">
+        <div class="section-head">
+          <div><div class="label">You're hosting</div>
+            <div class="card-title-c" th:text="'Departs ' + ${@fmt.when(hostedRide.departureTime())}">Departs</div></div>
+          <span class="pill" th:classappend="${#strings.toLowerCase(hostedRide.status().name())}" th:text="${@fmt.label(hostedRide.status())}">Open</span>
+        </div>
+        <div th:replace="~{fragments/layout :: route(${hostedRide.pickup()}, ${hostedRide.destination()})}"></div>
+        <div class="d-flex align-items-center gap-3 my-3">
+          <div class="seats">
+            <span class="seat" th:each="i : ${@fmt.dots(hostedRide.totalSeats(), 12)}" th:classappend="${i <= hostedRide.bookedSeats()} ? 'on'"></span>
+          </div>
+          <span class="small text-ink-3" th:text="${hostedRide.bookedSeats()} + ' of ' + ${hostedRide.totalSeats()} + ' seats taken'">seats</span>
+        </div>
+        <div class="label mb-1">Riders</div>
+        <div class="text-ink-3 small mb-3" th:if="${#lists.isEmpty(hostedRide.members())}">No one has joined yet.</div>
+        <ul class="people mb-3" th:unless="${#lists.isEmpty(hostedRide.members())}">
+          <li th:each="p : ${hostedRide.members()}">
+            <span class="avatar" th:text="${#strings.substring(p.name(), 0, 1)}">A</span>
+            <div class="flex-grow-1"><div class="fw-semibold text-body" th:text="${p.name()}">Name</div>
+              <div class="small text-ink-3" th:text="${p.seats()} + ' seat(s)'">1</div></div>
+            <a class="btn btn-sm btn-ghost" th:href="'tel:+91' + ${p.mobile()}"><i class="bi bi-telephone me-1"></i><span class="mono" th:text="${p.mobile()}">98</span></a>
+          </li>
+        </ul>
+        <div class="d-flex flex-wrap gap-2">
+          <form th:if="${hostedRide.notStarted() and hostedRide.bookedSeats() > 0}" th:action="@{/companion/rides/{id}/start(id=${hostedRide.id()})}" method="post">
+            <button type="submit" class="btn btn-route"><i class="bi bi-play-circle me-1"></i>Start ride</button>
+          </form>
+          <form th:if="${hostedRide.started()}" th:action="@{/companion/rides/{id}/complete(id=${hostedRide.id()})}" method="post">
+            <button type="submit" class="btn btn-route"><i class="bi bi-flag me-1"></i>Complete ride</button>
+          </form>
+          <form th:if="${hostedRide.notStarted()}" th:action="@{/companion/rides/{id}/cancel(id=${hostedRide.id()})}" method="post"
+                data-confirm="Cancel this ride? Riders will be notified on their dashboard.">
+            <button type="submit" class="btn btn-ghost"><i class="bi bi-x-circle me-1"></i>Cancel ride</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- ── Riding ───────────────────────────────────────── -->
+      <section class="card-c accent" th:if="${hostedRide == null and joinedRide != null}">
+        <div class="section-head">
+          <div><div class="label">You're riding</div>
+            <div class="card-title-c" th:text="'Departs ' + ${@fmt.when(joinedRide.departureTime())}">Departs</div></div>
+          <span class="pill" th:classappend="${#strings.toLowerCase(joinedRide.status().name())}" th:text="${@fmt.label(joinedRide.status())}">Open</span>
+        </div>
+        <div th:replace="~{fragments/layout :: route(${joinedRide.pickup()}, ${joinedRide.destination()})}"></div>
+        <ul class="people my-3">
+          <li>
+            <span class="avatar" th:text="${#strings.substring(joinedRide.hostName(), 0, 1)}">I</span>
+            <div class="flex-grow-1"><div class="fw-semibold text-body" th:text="${joinedRide.hostName()}">Host</div>
+              <div class="small text-ink-3" th:text="${joinedRide.note() != null ? joinedRide.note() : 'Your companion'}">note</div></div>
+            <a class="btn btn-sm btn-ghost" th:href="'tel:+91' + ${joinedRide.hostMobile()}"><i class="bi bi-telephone me-1"></i><span class="mono" th:text="${joinedRide.hostMobile()}">98</span></a>
+          </li>
+        </ul>
+        <form th:if="${joinedRide.notStarted()}" th:action="@{/companion/rides/{id}/leave(id=${joinedRide.id()})}" method="post"
+              data-confirm="Leave this ride?">
+          <button type="submit" class="btn btn-ghost"><i class="bi bi-box-arrow-left me-1"></i>Leave ride</button>
+        </form>
+      </section>
+
+      <!-- ── Offer a ride ─────────────────────────────────── -->
+      <section class="card-c accent" th:if="${hostedRide == null and joinedRide == null}">
+        <div class="label">Offer a ride</div>
+        <div class="card-title-c mb-3">Share your spare seats</div>
+        <form th:action="@{/companion/rides}" th:object="${form}" method="post" novalidate>
+          <div class="row g-2 align-items-end mb-3">
+            <div class="col">
+              <label class="form-label" for="pickupId">From</label>
+              <select class="form-select" th:field="*{pickupId}" required>
+                <option value="">Choose…</option>
+                <th:block th:replace="~{fragments/layout :: stopOptions(${locations})}"></th:block>
+              </select>
+            </div>
+            <div class="col-auto">
+              <button type="button" class="btn btn-ghost" data-swap="pickupId,destinationId" aria-label="Swap"><i class="bi bi-arrow-left-right"></i></button>
+            </div>
+            <div class="col">
+              <label class="form-label" for="destinationId">To</label>
+              <select class="form-select" th:field="*{destinationId}" required>
+                <option value="">Choose…</option>
+                <th:block th:replace="~{fragments/layout :: stopOptions(${locations})}"></th:block>
+              </select>
+            </div>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-sm-7">
+              <label class="form-label" for="departureTime">Departure</label>
+              <input class="form-control" id="departureTime" name="departureTime" type="datetime-local"
+                     th:value="${@fmt.inputIn(30)}" required>
+            </div>
+            <div class="col-sm-5">
+              <label class="form-label" for="totalSeats">Seats</label>
+              <input class="form-control" th:field="*{totalSeats}" type="number" min="1" th:max="${maxSeats}" required>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="note">Note <span class="text-ink-3 fw-normal">(optional)</span></label>
+            <input class="form-control" th:field="*{note}" maxlength="200" placeholder="e.g. Meeting at the library steps">
+          </div>
+          <button type="submit" class="btn btn-route"><i class="bi bi-megaphone me-1"></i>Offer ride</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- ── Rides on offer ───────────────────────────────────── -->
+    <div class="col-lg-6">
+      <section class="card-c">
+        <div class="section-head"><div><div class="label">Open now</div><div class="card-title-c">Rides on offer</div></div></div>
+        <div class="empty" th:if="${#lists.isEmpty(rides)}"><i class="bi bi-people"></i>No rides on offer right now.</div>
+        <article class="py-3 border-top" th:each="r : ${rides}">
+          <div class="d-flex justify-content-between gap-2 mb-2">
+            <div class="small text-ink-3">
+              <strong class="text-body" th:text="${r.hostName()}">Host</strong> ·
+              <span th:text="${@fmt.when(r.departureTime())}">time</span>
+            </div>
+            <span class="pill companion" th:if="${r.matchesMyRoute()}"><i class="bi bi-stars"></i>Your route</span>
+          </div>
+          <div th:replace="~{fragments/layout :: route(${r.pickup()}, ${r.destination()})}"></div>
+          <div class="small text-ink-3 mt-2" th:if="${r.note() != null}" th:text="${r.note()}">note</div>
+          <div class="d-flex align-items-center justify-content-between gap-2 mt-2">
+            <span class="small" th:text="${r.availableSeats()} + ' of ' + ${r.totalSeats()} + ' seats free'">2 free</span>
+            <form class="d-flex gap-2" th:action="@{/companion/rides/{id}/join(id=${r.id()})}" method="post"
+                  th:if="${hostedRide == null and joinedRide == null}">
+              <select class="form-select form-select-sm" name="seats" aria-label="Seats" style="width: 5rem">
+                <option th:each="n : ${@fmt.dots(r.availableSeats(), 4)}" th:value="${n}" th:text="${n}">1</option>
+              </select>
+              <button type="submit" class="btn btn-sm btn-route">Join</button>
+            </form>
+          </div>
+        </article>
+      </section>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>
