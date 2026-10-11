@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Trips')}"></head>
+<body class="role-driver">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+  <div class="page-head">
+    <div class="kicker">Driver · History</div>
+    <h1>Your trips</h1>
+  </div>
+  <section class="card-c">
+    <div class="empty" th:if="${#lists.isEmpty(trips)}"><i class="bi bi-truck-front"></i>No trips yet — reserve seats on a hotspot to start.</div>
+    <div class="table-responsive" th:unless="${#lists.isEmpty(trips)}">
+      <table class="table table-c">
+        <thead><tr><th>Created</th><th>Route</th><th>Seats</th><th>Started</th><th>Ended</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr th:each="t : ${trips}">
+            <td class="text-nowrap" th:text="${@fmt.when(t.createdAt())}">time</td>
+            <td th:text="${t.pickup()} + ' → ' + ${t.destination()}">route</td>
+            <td th:text="${t.seats()}">5</td>
+            <td th:text="${@fmt.time(t.startTime())}">—</td>
+            <td th:text="${@fmt.time(t.endTime())}">—</td>
+            <td><span class="pill" th:classappend="${#strings.toLowerCase(t.status().name())}" th:text="${@fmt.label(t.status())}">Done</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

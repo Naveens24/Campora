@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Create account')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container">
+  <div class="auth-wrap">
+    <div class="card-c accent">
+      <div class="kicker">Step 1 of 3 · Account</div>
+      <h1 class="h3 mb-4">Create your account</h1>
+
+      <form th:action="@{/register}" th:object="${form}" method="post" novalidate>
+        <div class="alert alert-danger flash" role="alert" th:if="${#fields.hasGlobalErrors()}">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div><div th:each="e : ${#fields.globalErrors()}" th:text="${e}">error</div></div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6">
+            <label class="form-label" for="firstName">First name</label>
+            <input class="form-control" th:field="*{firstName}" th:errorclass="is-invalid" autocomplete="given-name" required>
+            <div class="invalid-feedback" th:errors="*{firstName}"></div>
+          </div>
+          <div class="col-sm-6">
+            <label class="form-label" for="lastName">Last name</label>
+            <input class="form-control" th:field="*{lastName}" th:errorclass="is-invalid" autocomplete="family-name" required>
+            <div class="invalid-feedback" th:errors="*{lastName}"></div>
+          </div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="mobile">Mobile number</label>
+          <div class="input-group has-validation">
+            <span class="input-group-text mono">+91</span>
+            <input class="form-control" th:field="*{mobile}" th:errorclass="is-invalid" type="tel"
+                   inputmode="numeric" autocomplete="tel-national" placeholder="98765 43210" required>
+            <div class="invalid-feedback" th:errors="*{mobile}"></div>
+          </div>
+          <div class="form-text">We'll text a one-time code to verify it.</div>
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-control" th:field="*{password}" th:errorclass="is-invalid" type="password"
+                 autocomplete="new-password" required>
+          <div class="invalid-feedback" th:errors="*{password}"></div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="confirmPassword">Confirm password</label>
+          <input class="form-control" th:field="*{confirmPassword}"
+                 th:classappend="${#fields.hasErrors('passwordConfirmed') or #fields.hasErrors('confirmPassword')} ? 'is-invalid'"
+                 type="password" autocomplete="new-password" required>
+          <div class="invalid-feedback" th:errors="*{passwordConfirmed}"></div>
+          <div class="invalid-feedback" th:errors="*{confirmPassword}"></div>
+        </div>
+        <button type="submit" class="btn btn-route w-100 py-2">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+      </form>
+      <p class="text-center text-ink-3 mt-4 mb-0">Already registered? <a th:href="@{/login}">Sign in</a></p>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

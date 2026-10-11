@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Suggest a stop')}"></head>
+<body class="role-student">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+  <div class="page-head">
+    <div class="kicker">Student · Network</div>
+    <h1>Suggest a stop</h1>
+    <p>Missing a hostel, coaching centre or market? The transport office reviews every suggestion.</p>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <section class="card-c accent">
+        <form th:action="@{/student/suggest}" th:object="${form}" method="post" novalidate>
+          <div class="mb-3">
+            <label class="form-label" for="name">Place name</label>
+            <input class="form-control" th:field="*{name}" placeholder="e.g. Link Road Coaching Hub" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="area">Area <span class="text-ink-3 fw-normal">(optional)</span></label>
+            <input class="form-control" th:field="*{area}" placeholder="e.g. Link Road, Bilaspur">
+          </div>
+          <div class="mb-4">
+            <label class="form-label" for="reason">Why is it needed? <span class="text-ink-3 fw-normal">(optional)</span></label>
+            <textarea class="form-control" th:field="*{reason}" rows="3" maxlength="300"></textarea>
+          </div>
+          <button type="submit" class="btn btn-route"><i class="bi bi-send me-1"></i>Send suggestion</button>
+        </form>
+      </section>
+    </div>
+    <div class="col-lg-6">
+      <section class="card-c">
+        <div class="card-title-c mb-3">Your suggestions</div>
+        <div class="empty" th:if="${#lists.isEmpty(mine)}"><i class="bi bi-pin-map"></i>Nothing suggested yet.</div>
+        <ul class="people" th:unless="${#lists.isEmpty(mine)}">
+          <li th:each="s : ${mine}">
+            <span class="icon-badge"><i class="bi bi-geo"></i></span>
+            <div class="flex-grow-1">
+              <div class="fw-semibold text-body" th:text="${s.proposedName()}">Place</div>
+              <div class="small text-ink-3" th:text="${s.reviewNote() != null ? s.reviewNote() : 'Submitted ' + @fmt.ago(s.createdAt())}">note</div>
+            </div>
+            <span class="pill" th:classappend="${#strings.toLowerCase(s.status().name())}" th:text="${s.status().name()}">PENDING</span>
+          </li>
+        </ul>
+      </section>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

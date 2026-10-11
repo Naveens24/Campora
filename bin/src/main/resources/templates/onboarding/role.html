@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Choose your role')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-5" style="max-width: 820px">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+  <div class="page-head text-center">
+    <div class="kicker">Step 3 of 3 · Role</div>
+    <h1>How will you use Campora?</h1>
+    <p>Students who own a vehicle can still offer companion rides — no separate account needed.</p>
+  </div>
+  <div class="row g-3">
+    <div class="col-md-6">
+      <form th:action="@{/onboarding/role}" method="post" class="h-100">
+        <input type="hidden" name="role" value="STUDENT">
+        <button type="submit" class="role-card student">
+          <span class="icon-badge student mb-3"><i class="bi bi-mortarboard"></i></span>
+          <span class="d-block card-title-c">I'm a student</span>
+          <span class="d-block text-ink-3">Request rides, join companion rides, or offer your own seats.</span>
+        </button>
+      </form>
+    </div>
+    <div class="col-md-6">
+      <form th:action="@{/onboarding/role}" method="post" class="h-100">
+        <input type="hidden" name="role" value="DRIVER">
+        <button type="submit" class="role-card driver">
+          <span class="icon-badge driver mb-3"><i class="bi bi-truck-front"></i></span>
+          <span class="d-block card-title-c">I drive an auto / e-rickshaw</span>
+          <span class="d-block text-ink-3">See live demand hotspots and fill every seat on each trip.</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

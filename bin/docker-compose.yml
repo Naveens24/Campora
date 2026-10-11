@@ -1,0 +1,14 @@
+# Local PostgreSQL for the prod profile:  docker compose up -d
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: campora
+      POSTGRES_USER: campora
+      POSTGRES_PASSWORD: campora
+    ports:
+      - "5432:5432"
+    volumes:
+      - campora-pg:/var/lib/postgresql/data
+volumes:
+  campora-pg:

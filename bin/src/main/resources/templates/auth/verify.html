@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Verify mobile')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container">
+  <div class="auth-wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="card-c accent">
+      <div class="kicker">Step 2 of 3 · Verification</div>
+      <h1 class="h3 mb-2">Enter the 6-digit code</h1>
+      <p class="text-ink-3 mb-4">Sent to <span class="mono text-body" th:text="'+91 ' + ${maskedMobile}">+91 98•••••210</span></p>
+
+      <form th:action="@{/verify}" method="post" novalidate>
+        <label class="form-label visually-hidden" for="code">Verification code</label>
+        <input class="form-control otp-input mb-4" id="code" name="code" inputmode="numeric" pattern="[0-9]{6}"
+               maxlength="6" autocomplete="one-time-code" placeholder="••••••" required autofocus>
+        <button type="submit" class="btn btn-route w-100 py-2"><i class="bi bi-shield-check me-1"></i>Verify</button>
+      </form>
+      <form th:action="@{/verify/resend}" method="post" class="text-center mt-3">
+        <button type="submit" class="btn btn-link text-decoration-none">Resend code</button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

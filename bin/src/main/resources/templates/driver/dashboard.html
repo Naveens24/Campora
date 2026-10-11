@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Live demand')}"></head>
+<body class="role-driver">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container py-4">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+
+  <div class="page-head d-flex flex-wrap justify-content-between align-items-end gap-3">
+    <div>
+      <div class="kicker">Driver · Live demand</div>
+      <h1 th:text="'Namaste, ' + ${me.firstName()}">Namaste</h1>
+      <p><span th:text="${status.vehicle()}">Auto</span> · <span class="mono" th:text="${status.vehicleNumber()}">CG10</span> ·
+         <span th:text="${status.capacity()} + ' seats'">5 seats</span></p>
+    </div>
+    <form th:if="${status.verified()}" th:action="@{/driver/availability}" method="post" class="d-flex align-items-center gap-2">
+      <input type="hidden" name="online" th:value="${!status.online()}">
+      <span class="pill" th:classappend="${status.online()} ? 'matched' : ''">
+        <span class="live-dot" th:if="${status.online()}"></span>
+        <span th:text="${status.online()} ? 'Online' : 'Offline'">Offline</span>
+      </span>
+      <button type="submit" class="btn" th:classappend="${status.online()} ? 'btn-ghost' : 'btn-route'"
+              th:text="${status.online()} ? 'Go offline' : 'Go online'">Go online</button>
+    </form>
+  </div>
+
+  <section class="card-c accent-trip mb-4" th:unless="${status.verified()}">
+    <div class="d-flex gap-3">
+      <span class="icon-badge trip"><i class="bi bi-hourglass-split"></i></span>
+      <div>
+        <div class="card-title-c">Awaiting verification</div>
+        <p class="text-ink-3 mb-0">The transport office is checking your vehicle details. You'll see live demand here as soon as you're approved.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Current trip ─────────────────────────────────────── -->
+  <section class="card-c accent-trip mb-4" th:if="${trip != null}">
+    <div class="section-head">
+      <div>
+        <div class="label">Current trip</div>
+        <div class="card-title-c" th:text="${trip.seats()} + ' seat(s) filled'">5 seats</div>
+      </div>
+      <span class="pill" th:classappend="${#strings.toLowerCase(trip.status().name())}" th:text="${@fmt.label(trip.status())}">Scheduled</span>
+    </div>
+    <div class="mb-3" style="--route: var(--trip)">
+      <div th:replace="~{fragments/layout :: route(${trip.pickup()}, ${trip.destination()})}"></div>
+    </div>
+
+    <div class="label mb-1">Passengers</div>
+    <ul class="people mb-3" style="--route: var(--trip); --route-tint: var(--trip-tint); --route-ink: var(--trip-ink)">
+      <li th:each="p : ${trip.passengers()}">
+        <span class="avatar" th:text="${#strings.substring(p.name(), 0, 1)}">A</span>
+        <div class="flex-grow-1">
+          <div class="fw-semibold text-body" th:text="${p.name()}">Name</div>
+          <div class="small text-ink-3" th:text="${p.seats()} + ' seat(s)'">1 seat</div>
+        </div>
+        <a class="btn btn-sm btn-ghost" th:href="'tel:+91' + ${p.mobile()}"><i class="bi bi-telephone me-1"></i><span class="mono" th:text="${p.mobile()}">98</span></a>
+      </li>
+    </ul>
+
+    <div class="d-flex flex-wrap gap-2">
+      <form th:if="${trip.scheduled()}" th:action="@{/driver/trips/{id}/start(id=${trip.id()})}" method="post">
+        <button type="submit" class="btn btn-route btn-trip"><i class="bi bi-play-circle me-1"></i>Everyone's in — start trip</button>
+      </form>
+      <form th:if="${trip.inProgress()}" th:action="@{/driver/trips/{id}/complete(id=${trip.id()})}" method="post">
+        <button type="submit" class="btn btn-route btn-trip"><i class="bi bi-flag me-1"></i>Complete trip</button>
+      </form>
+      <form th:if="${trip.scheduled()}" th:action="@{/driver/trips/{id}/cancel(id=${trip.id()})}" method="post"
+            data-confirm="Cancel this trip? Your passengers go back on the board.">
+        <button type="submit" class="btn btn-ghost"><i class="bi bi-x-circle me-1"></i>Cancel</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ── Hotspot board ────────────────────────────────────── -->
+  <section th:if="${status.verified()}">
+    <div class="section-head">
+      <div>
+        <div class="label d-flex align-items-center gap-2"><span class="live-dot"></span>Live · refreshes every <span th:text="${refreshSeconds}">15</span>s</div>
+        <h2 class="h4 mb-0">Demand hotspots</h2>
+      </div>
+      <span class="small text-ink-3 mono" id="boardStamp"></span>
+    </div>
+
+    <p class="text-ink-3 small" th:unless="${canReserve}">
+      <i class="bi bi-info-circle me-1"></i>
+      <span th:if="${trip != null}">Finish your current trip to reserve more seats.</span>
+      <span th:if="${trip == null and !status.online()}">Go online to reserve seats.</span>
+    </p>
+
+    <div class="row g-3" id="hotspotBoard"
+         th:attr="data-endpoint=@{/api/v1/driver/hotspots},data-action=@{/driver/reserve},data-refresh=${refreshSeconds}">
+      <div class="col-12" th:if="${#lists.isEmpty(hotspots)}">
+        <div class="card-c empty"><i class="bi bi-signpost-split"></i>
+          <div class="fw-semibold text-body">No open demand right now</div>
+          <div class="small">New hotspots appear here automatically.</div></div>
+      </div>
+      <div class="col-12 col-xl-6" th:each="h : ${hotspots}">
+        <article class="hotspot h-100">
+          <div class="d-flex align-items-start gap-3 mb-3">
+            <div class="route flex-grow-1">
+              <div class="stop"><i class="pin"></i><span th:text="${h.pickupName()}">From</span></div>
+              <div class="track"></div>
+              <div class="stop"><i class="pin end"></i><span th:text="${h.destinationName()}">To</span></div>
+            </div>
+          </div>
+          <div class="d-flex gap-4 mb-3">
+            <div class="metric"><span th:text="${h.requests()}">6</span><small th:text="${h.requests() == 1} ? 'request' : 'requests'">requests</small></div>
+            <div class="metric"><span th:text="${h.seatsDemanded()}">10</span><small>seats</small></div>
+            <div class="metric"><span th:text="${@fmt.ago(h.waitingSince()).replace(' ago', '')}">4 min</span><small>waiting</small></div>
+          </div>
+          <div class="seats mb-3">
+            <span class="seat on" th:each="i : ${@fmt.dots(h.seatsDemanded(), 12)}"></span>
+            <span class="seat more" th:if="${h.seatsDemanded() > 12}" th:text="'+' + ${h.seatsDemanded() - 12}">+3</span>
+          </div>
+          <form th:if="${canReserve}" th:action="@{/driver/reserve}" method="post">
+            <input type="hidden" name="pickupId" th:value="${h.pickupId()}">
+            <input type="hidden" name="destinationId" th:value="${h.destinationId()}">
+            <input class="form-control" type="number" name="seats" min="1" th:max="${status.capacity()}"
+                   th:value="${h.suggestedSeats(status.capacity())}" aria-label="Seats to offer">
+            <button type="submit" class="btn btn-route flex-grow-1"><i class="bi bi-check2-circle me-1"></i>Reserve seats</button>
+          </form>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

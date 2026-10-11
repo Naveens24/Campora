@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Driver profile')}"></head>
+<body class="role-driver">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container">
+  <div class="auth-wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="card-c accent">
+      <div class="kicker">Almost there · Driver profile</div>
+      <h1 class="h3 mb-4">Register your vehicle</h1>
+      <form th:action="@{/onboarding/profile/driver}" th:object="${form}" method="post" novalidate>
+        <div class="mb-3">
+          <span class="form-label d-block">Vehicle type</span>
+          <div class="choice">
+            <th:block th:each="t : ${vehicleTypes}">
+              <input type="radio" th:field="*{vehicleType}" th:value="${t}" th:id="${'vt-' + t}">
+              <label th:for="${'vt-' + t}" th:text="${t.label}">Auto</label>
+            </th:block>
+          </div>
+        </div>
+        <div class="row g-3 mb-3">
+          <div class="col-7">
+            <label class="form-label" for="vehicleNumber">Vehicle number</label>
+            <input class="form-control mono text-uppercase" th:field="*{vehicleNumber}" th:errorclass="is-invalid" placeholder="CG10 AB 1234" required>
+            <div class="invalid-feedback" th:errors="*{vehicleNumber}"></div>
+          </div>
+          <div class="col-5">
+            <label class="form-label" for="seatCapacity">Passenger seats</label>
+            <input class="form-control" th:field="*{seatCapacity}" th:errorclass="is-invalid" type="number" min="1" max="12" required>
+            <div class="invalid-feedback" th:errors="*{seatCapacity}"></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="nativeArea">Usual area <span class="text-ink-3 fw-normal">(optional)</span></label>
+          <input class="form-control" th:field="*{nativeArea}" placeholder="e.g. Sarkanda">
+        </div>
+        <button type="submit" class="btn btn-route w-100 py-2">Submit for verification <i class="bi bi-arrow-right ms-1"></i></button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

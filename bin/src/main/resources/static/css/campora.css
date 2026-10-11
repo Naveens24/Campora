@@ -1,0 +1,339 @@
+/* ════════════════════════════════════════════════════════════════
+   Campora — transit / wayfinding design language
+   Route colours: indigo = students · teal = drivers · violet = companions
+                  amber = trips
+   Type: Archivo (display) · IBM Plex Sans (body) · IBM Plex Mono (labels)
+   ════════════════════════════════════════════════════════════════ */
+
+:root {
+  --student: #3D52E0;
+  --student-ink: #2B37A8;
+  --student-tint: #EEF0FE;
+  --driver: #0F8B7E;
+  --driver-ink: #0A6C61;
+  --driver-tint: #E7F5F2;
+  --companion: #7A46E6;
+  --companion-ink: #5A2FBC;
+  --companion-tint: #F2ECFE;
+  --trip: #D98A0B;
+  --trip-ink: #9A5F00;
+  --trip-tint: #FDF4E3;
+  --danger: #D1434B;
+
+  --ink: #0B1220;
+  --ink-2: #37445C;
+  --ink-3: #6B7890;
+  --line: #E1E6EE;
+  --line-2: #CDD5E0;
+  --paper: #F6F8FB;
+  --card: #FFFFFF;
+
+  --route: var(--student);
+  --route-tint: var(--student-tint);
+  --route-ink: var(--student-ink);
+
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(11, 18, 32, .05), 0 6px 24px -12px rgba(11, 18, 32, .18);
+
+  --bs-body-font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --bs-body-color: var(--ink-2);
+  --bs-body-bg: var(--paper);
+  --bs-border-color: var(--line);
+  --bs-link-color-rgb: 61, 82, 224;
+}
+
+body.role-driver    { --route: var(--driver);    --route-tint: var(--driver-tint);    --route-ink: var(--driver-ink); }
+body.role-companion { --route: var(--companion); --route-tint: var(--companion-tint); --route-ink: var(--companion-ink); }
+body.role-admin     { --route: var(--trip);      --route-tint: var(--trip-tint);      --route-ink: var(--trip-ink); }
+
+body { background: var(--paper); min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1 0 auto; }
+
+h1, h2, h3, h4, .display-font {
+  font-family: "Archivo", "IBM Plex Sans", sans-serif;
+  color: var(--ink);
+  letter-spacing: -.01em;
+}
+h1 { font-weight: 800; }
+h2, h3 { font-weight: 700; }
+
+.mono, .kicker, .label, code {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+.kicker {
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--route-ink);
+  font-weight: 500;
+}
+.label {
+  font-size: .7rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+.text-ink-3 { color: var(--ink-3) !important; }
+
+/* ── top bar ─────────────────────────────────────────────────── */
+.topbar {
+  background: var(--ink);
+  border-bottom: 3px solid var(--route);
+}
+.topbar .navbar-brand {
+  font-family: "Archivo", sans-serif;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  letter-spacing: -.02em;
+}
+.topbar .navbar-brand img { width: 30px; height: 30px; }
+.topbar .nav-link {
+  color: rgba(255, 255, 255, .72);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: .45rem .8rem !important;
+}
+.topbar .nav-link:hover, .topbar .nav-link:focus { color: #fff; }
+.topbar .nav-link.active { color: #fff; background: rgba(255, 255, 255, .1); }
+.topbar .navbar-toggler { border-color: rgba(255, 255, 255, .25); }
+.topbar .navbar-toggler-icon { filter: invert(1); }
+.user-chip {
+  display: inline-flex; align-items: center; gap: .5rem;
+  color: #fff; font-size: .9rem;
+}
+.role-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--route); display: inline-block; }
+.role-tag {
+  font-family: "IBM Plex Mono", monospace; font-size: .66rem; letter-spacing: .08em;
+  text-transform: uppercase; padding: .1rem .45rem; border-radius: 4px;
+  background: var(--route); color: #fff;
+}
+
+/* ── cards ───────────────────────────────────────────────────── */
+.card-c {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.35rem;
+}
+.card-c + .card-c { margin-top: 1rem; }
+.card-c.accent { border-top: 4px solid var(--route); }
+.card-c.accent-driver { border-top: 4px solid var(--driver); }
+.card-c.accent-companion { border-top: 4px solid var(--companion); }
+.card-c.accent-trip { border-top: 4px solid var(--trip); }
+.card-title-c {
+  font-family: "Archivo", sans-serif; font-weight: 700; color: var(--ink);
+  font-size: 1.1rem; margin-bottom: .2rem;
+}
+.section-head { display: flex; align-items: end; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.page-head { margin-bottom: 1.5rem; }
+.page-head h1 { font-size: clamp(1.6rem, 3vw, 2.1rem); margin: .25rem 0 .25rem; }
+.page-head p { color: var(--ink-3); margin: 0; }
+
+.icon-badge {
+  width: 40px; height: 40px; border-radius: 10px;
+  display: inline-grid; place-items: center; flex: 0 0 auto;
+  background: var(--route-tint); color: var(--route-ink); font-size: 1.15rem;
+}
+.icon-badge.driver { background: var(--driver-tint); color: var(--driver-ink); }
+.icon-badge.companion { background: var(--companion-tint); color: var(--companion-ink); }
+.icon-badge.trip { background: var(--trip-tint); color: var(--trip-ink); }
+.icon-badge.student { background: var(--student-tint); color: var(--student-ink); }
+
+/* ── buttons & forms ─────────────────────────────────────────── */
+.btn { font-weight: 600; border-radius: 10px; }
+.btn-route {
+  --bs-btn-bg: var(--route); --bs-btn-border-color: var(--route); --bs-btn-color: #fff;
+  --bs-btn-hover-bg: var(--route-ink); --bs-btn-hover-border-color: var(--route-ink); --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: var(--route-ink); --bs-btn-active-border-color: var(--route-ink);
+  --bs-btn-disabled-bg: var(--route); --bs-btn-disabled-border-color: var(--route);
+}
+.btn-driver { --route: var(--driver); --route-ink: var(--driver-ink); }
+.btn-companion { --route: var(--companion); --route-ink: var(--companion-ink); }
+.btn-trip { --route: var(--trip); --route-ink: var(--trip-ink); }
+.btn-student { --route: var(--student); --route-ink: var(--student-ink); }
+.btn-ghost {
+  --bs-btn-color: var(--ink-2); --bs-btn-border-color: var(--line-2);
+  --bs-btn-hover-bg: #fff; --bs-btn-hover-border-color: var(--ink-3); --bs-btn-hover-color: var(--ink);
+}
+.form-label { font-weight: 600; color: var(--ink); font-size: .9rem; }
+.form-control, .form-select { border-radius: 10px; border-color: var(--line-2); padding: .6rem .8rem; }
+.form-control:focus, .form-select:focus {
+  border-color: var(--route);
+  box-shadow: 0 0 0 .2rem color-mix(in srgb, var(--route) 18%, transparent);
+}
+.otp-input { font-family: "IBM Plex Mono", monospace; font-size: 1.6rem; letter-spacing: .5em; text-align: center; }
+
+/* segmented choice (request type, role cards) */
+.choice { display: grid; gap: .5rem; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+.choice input { position: absolute; opacity: 0; pointer-events: none; }
+.choice label {
+  border: 1.5px solid var(--line-2); border-radius: 10px; padding: .55rem .75rem;
+  cursor: pointer; text-align: center; font-weight: 600; font-size: .9rem; background: #fff;
+  transition: border-color .15s, background .15s;
+}
+.choice input:checked + label { border-color: var(--route); background: var(--route-tint); color: var(--route-ink); }
+.choice input:focus-visible + label { outline: 2px solid var(--route); outline-offset: 2px; }
+
+.role-card {
+  display: block; border: 1.5px solid var(--line-2); border-radius: var(--radius); padding: 1.4rem;
+  background: #fff; cursor: pointer; height: 100%; transition: transform .15s, border-color .15s, box-shadow .15s;
+  text-align: left; width: 100%;
+}
+.role-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.role-card.student:hover { border-color: var(--student); }
+.role-card.driver:hover { border-color: var(--driver); }
+
+/* ── route line (pickup ●━━● destination) ────────────────────── */
+.route {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .6rem;
+  font-family: "Archivo", sans-serif; font-weight: 700; color: var(--ink);
+}
+.route .stop { display: flex; align-items: center; gap: .45rem; min-width: 0; }
+.route .stop span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.route .pin { width: 12px; height: 12px; border-radius: 50%; border: 3px solid var(--route); background: #fff; flex: 0 0 auto; }
+.route .pin.end { background: var(--route); }
+.route .track { height: 4px; border-radius: 4px; background: var(--route); opacity: .85; min-width: 24px; }
+.route.stacked { grid-template-columns: 1fr; gap: .25rem; }
+.route.stacked .track { width: 4px; height: 18px; margin-left: 4px; }
+
+/* ── progress stations (request lifecycle) ───────────────────── */
+.stations { display: grid; grid-template-columns: repeat(4, 1fr); position: relative; margin: 1.25rem 0 .5rem; }
+.stations::before {
+  content: ""; position: absolute; top: 9px; left: 12.5%; right: 12.5%; height: 4px;
+  background: var(--line); border-radius: 4px;
+}
+.stations .fill {
+  position: absolute; top: 9px; left: 12.5%; height: 4px; border-radius: 4px; background: var(--route);
+  transition: width .6s ease;
+}
+.stations .st { position: relative; text-align: center; font-size: .8rem; color: var(--ink-3); }
+.stations .st i {
+  display: block; width: 22px; height: 22px; margin: 0 auto .4rem; border-radius: 50%;
+  background: #fff; border: 4px solid var(--line-2); position: relative; z-index: 1;
+}
+.stations .st.done i { border-color: var(--route); background: var(--route); }
+.stations .st.now i { border-color: var(--route); box-shadow: 0 0 0 6px color-mix(in srgb, var(--route) 18%, transparent); }
+.stations .st.done, .stations .st.now { color: var(--ink); font-weight: 600; }
+.stations[data-stage="1"] .fill { width: 0; }
+.stations[data-stage="2"] .fill { width: 25%; }
+.stations[data-stage="3"] .fill { width: 50%; }
+.stations[data-stage="4"] .fill { width: 75%; }
+
+/* ── seat bar ────────────────────────────────────────────────── */
+.seats { display: flex; flex-wrap: wrap; gap: 5px; }
+.seat {
+  width: 18px; height: 18px; border-radius: 5px; background: var(--route-tint);
+  border: 1.5px solid color-mix(in srgb, var(--route) 45%, transparent);
+}
+.seat.on { background: var(--route); border-color: var(--route); }
+.seat.more { width: auto; padding: 0 .35rem; font: 600 .7rem "IBM Plex Mono", monospace; display: grid; place-items: center; color: var(--route-ink); }
+
+/* ── hotspot board (driver) ──────────────────────────────────── */
+.hotspot {
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 1.1rem 1.2rem; box-shadow: var(--shadow); border-left: 5px solid var(--driver);
+  animation: rise .35s ease both;
+}
+.hotspot .metric { font-family: "Archivo", sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--ink); line-height: 1; }
+.hotspot .metric small { font: 500 .7rem "IBM Plex Mono", monospace; letter-spacing: .06em; color: var(--ink-3); text-transform: uppercase; display: block; margin-top: .3rem; }
+.hotspot form { display: flex; gap: .5rem; align-items: center; }
+.hotspot input[type=number] { width: 84px; }
+.live-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--driver); display: inline-block;
+  box-shadow: 0 0 0 0 rgba(15, 139, 126, .6); animation: pulse 1.8s infinite;
+}
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(15, 139, 126, .55); } 70% { box-shadow: 0 0 0 10px rgba(15, 139, 126, 0); } 100% { box-shadow: 0 0 0 0 rgba(15, 139, 126, 0); } }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+/* ── status pills ────────────────────────────────────────────── */
+.pill {
+  display: inline-flex; align-items: center; gap: .35rem; padding: .18rem .6rem; border-radius: 999px;
+  font: 500 .72rem "IBM Plex Mono", monospace; letter-spacing: .04em; text-transform: uppercase;
+  background: var(--line); color: var(--ink-2); white-space: nowrap;
+}
+.pill.open, .pill.scheduled { background: var(--student-tint); color: var(--student-ink); }
+.pill.matched, .pill.full { background: var(--driver-tint); color: var(--driver-ink); }
+.pill.in_trip, .pill.in_progress, .pill.started { background: var(--trip-tint); color: var(--trip-ink); }
+.pill.completed, .pill.approved { background: #E6F4EA; color: #1E7B3A; }
+.pill.cancelled, .pill.expired, .pill.rejected { background: #FBE9EA; color: #A3262E; }
+.pill.auto { background: var(--driver-tint); color: var(--driver-ink); }
+.pill.companion, .pill.hosted { background: var(--companion-tint); color: var(--companion-ink); }
+
+/* ── people list (revealed after acceptance) ─────────────────── */
+.people { list-style: none; padding: 0; margin: 0; }
+.people li { display: flex; align-items: center; gap: .75rem; padding: .6rem 0; border-top: 1px dashed var(--line); }
+.people li:first-child { border-top: 0; }
+.avatar {
+  width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: 0 0 auto;
+  background: var(--route-tint); color: var(--route-ink); font-weight: 700; font-family: "Archivo", sans-serif;
+}
+
+/* ── stats tiles (admin) ─────────────────────────────────────── */
+.stat { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; height: 100%; }
+.stat .v { font: 800 1.9rem/1 "Archivo", sans-serif; color: var(--ink); }
+.stat .k { font: 500 .7rem "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-top: .4rem; }
+.stat.alert { border-color: var(--trip); background: var(--trip-tint); }
+
+/* ── tables ──────────────────────────────────────────────────── */
+.table-c { --bs-table-bg: transparent; margin: 0; }
+.table-c th { font: 500 .7rem "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); border-bottom-color: var(--line-2); white-space: nowrap; }
+.table-c td { vertical-align: middle; border-color: var(--line); }
+
+/* ── empty states ────────────────────────────────────────────── */
+.empty { text-align: center; padding: 2rem 1rem; color: var(--ink-3); }
+.empty i { font-size: 2rem; color: var(--line-2); display: block; margin-bottom: .5rem; }
+
+/* ── flash ───────────────────────────────────────────────────── */
+.flash { border-radius: 12px; border: 0; display: flex; gap: .6rem; align-items: flex-start; box-shadow: var(--shadow); }
+.flash.alert-success { background: #E6F4EA; color: #174F2A; }
+.flash.alert-danger { background: #FBE9EA; color: #7E1C22; }
+.flash.alert-info { background: var(--trip-tint); color: #6B4200; }
+
+/* ── landing ─────────────────────────────────────────────────── */
+.hero {
+  background: radial-gradient(1200px 400px at 90% -10%, rgba(61, 82, 224, .35), transparent 60%),
+              radial-gradient(800px 380px at -10% 110%, rgba(15, 139, 126, .35), transparent 60%),
+              var(--ink);
+  color: #fff; padding: 4.5rem 0 5rem; position: relative; overflow: hidden;
+}
+.hero h1 { color: #fff; font-size: clamp(2.2rem, 5vw, 3.6rem); line-height: 1.05; }
+.hero p.lead { color: rgba(255, 255, 255, .75); max-width: 34rem; }
+.hero .kicker { color: #9FB0FF; }
+.hero-map { width: 100%; height: auto; }
+.hero-map .ln { fill: none; stroke-width: 6; stroke-linecap: round; }
+.hero-map .dash { stroke-dasharray: 8 12; animation: flow 3s linear infinite; }
+@keyframes flow { to { stroke-dashoffset: -40; } }
+.steps { counter-reset: step; }
+.step-c { position: relative; padding-left: 3.2rem; margin-bottom: 1.4rem; }
+.step-c::before {
+  counter-increment: step; content: counter(step, decimal-leading-zero);
+  position: absolute; left: 0; top: 0; font: 600 .8rem "IBM Plex Mono", monospace;
+  width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center;
+  background: var(--route-tint); color: var(--route-ink);
+}
+.feature { height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 1rem; font-size: .85rem; color: rgba(255, 255, 255, .8); }
+.legend span { display: inline-flex; align-items: center; gap: .4rem; }
+.legend i { width: 18px; height: 5px; border-radius: 4px; display: inline-block; }
+
+.auth-wrap { max-width: 460px; margin: 3rem auto; }
+.auth-wrap .card-c { padding: 2rem; }
+
+.site-footer { border-top: 1px solid var(--line); color: var(--ink-3); font-size: .85rem; padding: 1.5rem 0; margin-top: 3rem; }
+
+@media (max-width: 575.98px) {
+  .card-c { padding: 1.1rem; }
+  .hotspot form { flex-wrap: wrap; }
+  .stations .st { font-size: .7rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+.min-w-0 { min-width: 0; }
+.h1, .h2, .h3, .h4, .h5, .h6 { font-family: "Archivo", "IBM Plex Sans", sans-serif; font-weight: 700; color: var(--ink); }
+.label .live-dot { flex: 0 0 auto; }

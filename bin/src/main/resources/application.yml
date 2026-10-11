@@ -1,0 +1,95 @@
+# ─────────────────────────────────────────────────────────────
+#  Campora — shared configuration (all profiles)
+#  Profile-specific overrides live in application-{dev,prod,test}.yml
+# ─────────────────────────────────────────────────────────────
+spring:
+  application:
+    name: campora
+  profiles:
+    default: dev
+
+  jpa:
+    # Views receive DTOs built inside transactional services, so the
+    # session is never held open for the whole request.
+    open-in-view: false
+    hibernate:
+      ddl-auto: none            # Flyway owns the schema
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 25
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+        default_batch_fetch_size: 32
+        query:
+          in_clause_parameter_padding: true
+          fail_on_pagination_over_collection_fetch: true
+
+  flyway:
+    # {vendor} resolves to "h2" or "postgresql" so Postgres-only features
+    # (partial unique indexes) live in their own folder.
+    locations: classpath:db/migration/common,classpath:db/migration/{vendor}
+
+  thymeleaf:
+    cache: true
+
+  web:
+    resources:
+      chain:
+        strategy:
+          content:
+            enabled: true
+            paths: /css/**,/js/**,/img/**
+      cache:
+        cachecontrol:
+          max-age: 30d
+          cache-public: true
+
+  mvc:
+    problemdetails:
+      enabled: true
+
+server:
+  port: 8080
+  compression:
+    enabled: true
+    mime-types: text/html,text/css,application/javascript,application/json,image/svg+xml
+    min-response-size: 1024
+  servlet:
+    session:
+      timeout: 8h
+      cookie:
+        http-only: true
+        same-site: lax
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+# ── Application settings (bound to CamporaProperties) ──────────
+campora:
+  zone: Asia/Kolkata
+  otp:
+    length: 6
+    ttl: PT5M
+    max-attempts: 5
+    resend-cooldown: PT30S
+    expose-in-ui: false        # true only in dev: shows the OTP on screen
+  mobility:
+    request-ttl: PT45M         # an OPEN request expires after this
+    max-seats-per-request: 4
+    hotspot-refresh-seconds: 15
+    expiry-sweep-ms: 60000
+  companion:
+    max-seats: 6
+    join-grace: PT15M          # rides stay joinable this long after departure time
