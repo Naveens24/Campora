@@ -1,0 +1,56 @@
+name: Deploy to EC2 (rolling)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Run tests
+        run: mvn -B test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      fail-fast: true
+      matrix:
+        host: [EC2_HOST_1, EC2_HOST_2]
+    steps:
+      - name: Pull, build, restart, verify
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets[matrix.host] }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 20m
+          script: |
+            set -e
+            cd ~/campora
+            git fetch origin main
+            git reset --hard origin/main
+            mvn -q clean package -DskipTests
+            sudo systemctl restart campora
+            for i in $(seq 1 40); do
+              if curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP; then
+                echo "Healthy"; exit 0
+              fi
+              sleep 3
+            done
+            echo "App did not become healthy"
+            sudo journalctl -u campora -n 80 --no-pager
+            exit 1
