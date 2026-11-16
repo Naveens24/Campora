@@ -1,4 +1,4 @@
-name: Deploy to EC2 (rolling)
+name: Deploy to EC2
 
 on:
   push:
@@ -30,11 +30,6 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 1
-      fail-fast: true
-      matrix:
-        host: [EC2_HOST_1]
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -43,7 +38,7 @@ jobs:
       - name: Copy jar to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets[matrix.host] }}
+          host: ${{ secrets.EC2_HOST_1 }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           source: campora.jar
@@ -52,17 +47,18 @@ jobs:
       - name: Swap jar, restart, verify
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets[matrix.host] }}
+          host: ${{ secrets.EC2_HOST_1 }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           command_timeout: 10m
           script: |
             set -e
-            cd ~/campora
-            git fetch origin main
-            git reset --hard origin/main
-            mkdir -p target
-            mv ~/deploy-incoming/campora.jar target/campora.jar
+            mkdir -p ~/campora/target
+            # keep the previous jar for a quick rollback
+            if [ -f ~/campora/target/campora.jar ]; then
+              cp ~/campora/target/campora.jar ~/campora/target/campora.jar.prev
+            fi
+            mv ~/deploy-incoming/campora.jar ~/campora/target/campora.jar
             sudo systemctl restart campora
             for i in $(seq 1 40); do
               if curl -fsS http://127.0.0.1:8080/actuator/health | grep -q UP; then
@@ -70,6 +66,10 @@ jobs:
               fi
               sleep 3
             done
-            echo "App did not become healthy"
+            echo "App did not become healthy, rolling back"
             sudo journalctl -u campora -n 80 --no-pager
+            if [ -f ~/campora/target/campora.jar.prev ]; then
+              mv ~/campora/target/campora.jar.prev ~/campora/target/campora.jar
+              sudo systemctl restart campora
+            fi
             exit 1
