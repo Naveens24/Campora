@@ -1,211 +1,165 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/layout :: head('Campus mobility')}"></head>
-  <body>
+  <head th:replace="~{fragments/layout :: head('Campus rides, made easier')}"></head>
+  <body class="landing-page">
     <nav th:replace="~{fragments/layout :: nav}"></nav>
 
     <header class="hero">
       <div class="container">
-        <div class="row align-items-center g-5">
-          <div class="col-lg-6">
-            <div class="kicker mb-3">GGV · Campus mobility platform</div>
-            <h1 class="mb-3">
-              Ten students.<br />One route.<br />
-              Zero Guesswork
-            </h1>
+        <div class="row align-items-center g-4 g-lg-5">
+          <div class="col-lg-5">
+            <div class="hero-kicker"><span class="hero-kicker-dot"></span>Made for GGV, Bilaspur</div>
+            <h1 class="mb-3">Same route.<br />More people.<br /><span>Easier rides.</span></h1>
             <p class="lead mb-4">
-              Campora groups ride requests into live demand hotspots, so auto
-              drivers fill every seat and students stop waiting at the gate.
+              Heading out from campus? Find students and drivers going your way,
+              share a ride, and spend less time waiting.
             </p>
             <div class="d-flex flex-wrap gap-2 mb-4">
-              <a
-                th:if="${me == null}"
-                class="btn btn-lg btn-light"
-                th:href="@{/register}"
-                ><i class="bi bi-person-plus me-1"></i>Get started</a
-              >
-              <a
-                th:if="${me == null}"
-                class="btn btn-lg btn-outline-light"
-                th:href="@{/login}"
-                >Sign in</a
-              >
-              <a
-                th:if="${me != null}"
-                class="btn btn-lg btn-light"
-                th:href="@{/dashboard}"
-                ><i class="bi bi-arrow-right-circle me-1"></i>Open my
-                dashboard</a
-              >
+              <a th:if="${me == null}" class="btn btn-lg btn-route" th:href="@{/register}">
+                Get started <i class="bi bi-arrow-right ms-2"></i>
+              </a>
+              <a th:if="${me == null}" class="btn btn-lg btn-hero-secondary" th:href="@{/login}">
+                <i class="bi bi-play-circle me-2"></i>Sign in
+              </a>
+              <a th:if="${me != null}" class="btn btn-lg btn-route" th:href="@{/dashboard}">
+                Open my dashboard <i class="bi bi-arrow-right ms-2"></i>
+              </a>
             </div>
-            <div class="legend">
-              <span><i style="background: #3d52e0"></i>Students</span>
-              <span><i style="background: #0f8b7e"></i>Drivers</span>
-              <span><i style="background: #7a46e6"></i>Companions</span>
-              <span><i style="background: #d98a0b"></i>Trips</span>
+            <div class="hero-note">
+              <span class="hero-note-icon"><i class="bi bi-shield-check"></i></span>
+              Your details stay private until your ride is confirmed.
             </div>
           </div>
-          <div class="col-lg-6">
-            <svg
-              class="hero-map"
-              viewBox="0 0 520 380"
-              role="img"
-              aria-label="Three route lines converging on one hotspot and continuing as a trip"
-            >
-              <path
-                class="ln"
-                d="M30 70 C160 70 170 190 260 190"
-                stroke="#3D52E0"
-              />
-              <path
-                class="ln"
-                d="M30 310 C160 310 170 190 260 190"
-                stroke="#0F8B7E"
-              />
-              <path class="ln" d="M30 190 L260 190" stroke="#7A46E6" />
-              <path
-                class="ln dash"
-                d="M260 190 C360 190 380 110 490 110"
-                stroke="#D98A0B"
-              />
-              <g fill="#fff" stroke-width="5">
-                <circle cx="30" cy="70" r="11" stroke="#3D52E0" />
-                <circle cx="30" cy="190" r="11" stroke="#7A46E6" />
-                <circle cx="30" cy="310" r="11" stroke="#0F8B7E" />
-                <circle
-                  cx="490"
-                  cy="110"
-                  r="13"
-                  stroke="#D98A0B"
-                  fill="#D98A0B"
-                />
-              </g>
-              <circle cx="260" cy="190" r="34" fill="rgba(15,139,126,.18)" />
-              <circle
-                cx="260"
-                cy="190"
-                r="20"
-                fill="#0B1220"
-                stroke="#fff"
-                stroke-width="4"
-              />
-              <text
-                x="260"
-                y="196"
-                text-anchor="middle"
-                font-family="IBM Plex Mono"
-                font-size="15"
-                font-weight="600"
-                fill="#fff"
-              >
-                10
-              </text>
-              <g
-                font-family="IBM Plex Mono"
-                font-size="12"
-                fill="rgba(255,255,255,.75)"
-              >
-                <text x="50" y="52">Engineering Block</text>
-                <text x="50" y="172">Companion offer</text>
-                <text x="50" y="340">Driver A · Driver B</text>
-                <text x="222" y="244">hotspot</text>
-                <text x="400" y="88">Rajkishore Nagar</text>
-              </g>
-            </svg>
+          <div class="col-lg-7">
+            <div class="campus-scene" role="img" aria-label="Students sharing a ride from the GGV campus to Rajkishore Nagar">
+              <div class="scene-sun"></div>
+              <div class="scene-campus">
+                <div class="campus-building campus-building-back">
+                  <span class="building-roof"></span>
+                  <span class="building-windows"></span>
+                </div>
+                <div class="campus-building campus-building-front">
+                  <span class="building-roof"></span>
+                  <span class="building-sign">GGV</span>
+                  <span class="building-windows"></span>
+                </div>
+                <div class="scene-tree scene-tree-left"></div>
+                <div class="scene-tree scene-tree-right"></div>
+              </div>
+              <svg class="scene-route" viewBox="0 0 640 360" aria-hidden="true">
+                <path d="M92 94 C220 94 222 180 325 180 S451 105 552 105" fill="none" stroke="#3158ed" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 0"/>
+                <circle cx="92" cy="94" r="8" fill="#3158ed"/>
+                <circle cx="552" cy="105" r="8" fill="#10a99a"/>
+              </svg>
+              <div class="scene-place scene-place-start"><i class="bi bi-geo-alt-fill"></i><span>Engineering Block</span></div>
+              <div class="scene-place scene-place-end"><i class="bi bi-geo-alt-fill"></i><span>Rajkishore Nagar</span></div>
+              <div class="scene-car"><i class="bi bi-car-front-fill"></i></div>
+              <div class="scene-students" aria-hidden="true">
+                <div class="scene-student student-one"><span class="student-head"></span><span class="student-body"></span></div>
+                <div class="scene-student student-two"><span class="student-head"></span><span class="student-body"></span></div>
+                <div class="scene-student student-three"><span class="student-head"></span><span class="student-body"></span></div>
+              </div>
+              <div class="scene-caption">
+                <span class="scene-caption-icon"><i class="bi bi-people-fill"></i></span>
+                <span><strong>Going the same way?</strong><small>Make the trip together.</small></span>
+                <i class="bi bi-arrow-up-right ms-auto"></i>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </header>
 
-    <main class="container py-5">
-      <div class="row g-5">
-        <div class="col-lg-5">
-          <div class="kicker">How it works</div>
-          <h2 class="mb-4">Demand first, then the ride.</h2>
-          <div class="steps">
-            <div class="step-c">
-              <h3 class="h6 mb-1">Students say where they're going</h3>
-              <p class="text-ink-3 mb-0">
-                Pick a pickup point and destination. No booking, no waiting for
-                a single auto.
-              </p>
+    <main>
+      <section class="how-section" id="how-it-works">
+        <div class="container">
+          <div class="section-intro text-center">
+            <span class="section-eyebrow">A better way to get there</span>
+            <h2>Getting a ride is easy.</h2>
+            <p>One campus community, one route at a time.</p>
+          </div>
+          <div class="row g-3 g-lg-4 steps-grid">
+            <div class="col-sm-6 col-lg-3">
+              <article class="step-card">
+                <span class="step-icon step-blue"><i class="bi bi-geo-alt-fill"></i></span>
+                <span class="step-number">01</span>
+                <h3>Choose your route</h3>
+                <p>Pick where you are and where you need to go.</p>
+              </article>
             </div>
-            <div class="step-c">
-              <h3 class="h6 mb-1">Requests cluster into a hotspot</h3>
-              <p class="text-ink-3 mb-0">
-                Everyone on the same route forms one live demand cluster drivers
-                can see.
-              </p>
+            <div class="col-sm-6 col-lg-3">
+              <article class="step-card">
+                <span class="step-icon step-purple"><i class="bi bi-people-fill"></i></span>
+                <span class="step-number">02</span>
+                <h3>Join the request</h3>
+                <p>See who else is heading the same way.</p>
+              </article>
             </div>
-            <div class="step-c">
-              <h3 class="h6 mb-1">Drivers reserve seats</h3>
-              <p class="text-ink-3 mb-0">
-                Driver A takes 5, Driver B takes 5 — the hotspot closes by
-                itself.
-              </p>
+            <div class="col-sm-6 col-lg-3">
+              <article class="step-card">
+                <span class="step-icon step-teal"><i class="bi bi-car-front-fill"></i></span>
+                <span class="step-number">03</span>
+                <h3>Meet your ride</h3>
+                <p>A driver picks up the shared route request.</p>
+              </article>
             </div>
-            <div class="step-c">
-              <h3 class="h6 mb-1">Ride, complete, remember</h3>
-              <p class="text-ink-3 mb-0">
-                Contacts are revealed only after acceptance; every trip is saved
-                to history.
-              </p>
+            <div class="col-sm-6 col-lg-3">
+              <article class="step-card">
+                <span class="step-icon step-amber"><i class="bi bi-flag-fill"></i></span>
+                <span class="step-number">04</span>
+                <h3>Reach your stop</h3>
+                <p>Travel together and get on with your day.</p>
+              </article>
             </div>
           </div>
         </div>
-        <div class="col-lg-7">
-          <div class="row g-3">
-            <div class="col-sm-6">
-              <div class="card-c feature">
-                <span class="icon-badge driver mb-3"
-                  ><i class="bi bi-diagram-3"></i
-                ></span>
-                <h3 class="card-title-c">Demand clustering</h3>
-                <p class="text-ink-3 mb-0">
-                  Row-locked seat allocation means two drivers can never claim
-                  the same student.
-                </p>
+      </section>
+
+      <section class="community-section" id="students">
+        <div class="container">
+          <div class="row align-items-center g-4 g-lg-5">
+            <div class="col-lg-6">
+              <div class="community-art" aria-hidden="true">
+                <div class="community-orbit orbit-one"></div>
+                <div class="community-orbit orbit-two"></div>
+                <div class="community-center"><i class="bi bi-people-fill"></i></div>
+                <span class="community-bubble bubble-one"><i class="bi bi-geo-alt-fill"></i></span>
+                <span class="community-bubble bubble-two"><i class="bi bi-car-front-fill"></i></span>
+                <span class="community-bubble bubble-three"><i class="bi bi-heart-fill"></i></span>
+                <span class="community-path path-one"></span>
+                <span class="community-path path-two"></span>
               </div>
             </div>
-            <div class="col-sm-6">
-              <div class="card-c feature">
-                <span class="icon-badge student mb-3"
-                  ><i class="bi bi-incognito"></i
-                ></span>
-                <h3 class="card-title-c">Anonymous until matched</h3>
-                <p class="text-ink-3 mb-0">
-                  Drivers see route totals only. Names and numbers appear after
-                  a ride is confirmed.
-                </p>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <div class="card-c feature">
-                <span class="icon-badge companion mb-3"
-                  ><i class="bi bi-people"></i
-                ></span>
-                <h3 class="card-title-c">Companion rides</h3>
-                <p class="text-ink-3 mb-0">
-                  Any student with a vehicle can offer spare seats to classmates
-                  on the same route.
-                </p>
-              </div>
-            </div>
-            <div class="col-sm-6">
-              <div class="card-c feature">
-                <span class="icon-badge trip mb-3"
-                  ><i class="bi bi-shield-check"></i
-                ></span>
-                <h3 class="card-title-c">Verified drivers</h3>
-                <p class="text-ink-3 mb-0">
-                  OTP-verified accounts, and the transport office approves every
-                  vehicle.
-                </p>
-              </div>
+            <div class="col-lg-6">
+              <span class="section-eyebrow">For students</span>
+              <h2>Less waiting at the gate.<br />More time for your day.</h2>
+              <p class="community-copy">Put your destination on the board and let fellow students and verified drivers going your way find you. Prefer to travel with a classmate? Browse companion rides, too.</p>
+              <ul class="benefit-list">
+                <li><i class="bi bi-check-circle-fill"></i>See ride progress as it happens</li>
+                <li><i class="bi bi-check-circle-fill"></i>Find classmates travelling your route</li>
+                <li><i class="bi bi-check-circle-fill"></i>Your contact details are shared after matching</li>
+              </ul>
+              <a th:if="${me == null}" class="btn btn-route" th:href="@{/register}">Find your ride <i class="bi bi-arrow-right ms-2"></i></a>
+              <a th:if="${me != null}" class="btn btn-route" th:href="@{/dashboard}">Go to my rides <i class="bi bi-arrow-right ms-2"></i></a>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <section class="driver-section" id="drivers">
+        <div class="container">
+          <div class="driver-callout">
+            <span class="driver-callout-icon"><i class="bi bi-steering-wheel"></i></span>
+            <div class="driver-callout-copy">
+              <span class="section-eyebrow">For drivers</span>
+              <h2>See who's heading your way.</h2>
+              <p>View live demand by route, reserve seats, and make each trip count.</p>
+            </div>
+            <a th:if="${me == null}" class="btn btn-light" th:href="@{/register}">Join as a driver <i class="bi bi-arrow-right ms-2"></i></a>
+            <a th:if="${me != null}" class="btn btn-light" th:href="@{/dashboard}">Open dashboard <i class="bi bi-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </section>
     </main>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
