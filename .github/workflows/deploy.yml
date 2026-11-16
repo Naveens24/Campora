@@ -34,7 +34,7 @@ jobs:
       max-parallel: 1
       fail-fast: true
       matrix:
-        host: [EC2_HOST_1, EC2_HOST_2]
+        host: [EC2_HOST_1]
     steps:
       - uses: actions/download-artifact@v4
         with:
