@@ -160,6 +160,53 @@
     document.addEventListener('visibilitychange', refresh);
   }
 
+  // ── 5. landing polish: sticky nav shadow, scroll reveal, mode tabs
+  const topbar = document.querySelector('.topbar');
+  if (topbar) {
+    const onScroll = () => topbar.classList.toggle('scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  const reveals = document.querySelectorAll('.reveal');
+  if (reveals.length && 'IntersectionObserver' in window) {
+    // Anything already on screen is marked visible before hiding the rest,
+    // so above-the-fold content never flickers.
+    reveals.forEach((node) => {
+      if (node.getBoundingClientRect().top < window.innerHeight) node.classList.add('in');
+    });
+    document.documentElement.classList.add('js');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    reveals.forEach((node) => { if (!node.classList.contains('in')) io.observe(node); });
+  }
+
+  const tabs = document.querySelectorAll('.mode-switch [role="tab"]');
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        const panel = document.getElementById(t.dataset.tab);
+        if (panel) panel.hidden = !on;
+      });
+    });
+    tab.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      const list = Array.from(tabs);
+      const next = list[(list.indexOf(tab) + (e.key === 'ArrowRight' ? 1 : list.length - 1)) % list.length];
+      next.focus();
+      next.click();
+    });
+  });
+
   // ── 4. student live status ────────────────────────────────────
   const watch = document.querySelector('[data-watch-request]');
   if (watch) {

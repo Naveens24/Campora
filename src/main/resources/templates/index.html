@@ -1,68 +1,108 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-  <head th:replace="~{fragments/layout :: head('Campus rides, made easier')}"></head>
-  <body class="landing-page">
+  <head th:replace="~{fragments/layout :: head('Ride together, for free')}"></head>
+  <body class="landing-page role-companion">
     <nav th:replace="~{fragments/layout :: nav}"></nav>
 
+    <!-- ── Hero ─────────────────────────────────────────────── -->
     <header class="hero">
       <div class="container">
-        <div class="row align-items-center g-4 g-lg-5">
-          <div class="col-lg-5">
-            <div class="hero-kicker"><span class="hero-kicker-dot"></span>Made for GGV, Bilaspur</div>
-            <h1 class="mb-3">Same route.<br />More people.<br /><span>Easier rides.</span></h1>
-            <p class="lead mb-4">
-              Heading out from campus? Find students and drivers going your way,
-              share a ride, and spend less time waiting.
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <span class="eyebrow-pill"><b>New</b>Companion mode is live at GGV</span>
+            <h1>Someone's already going <span class="mark">your way.</span></h1>
+            <p class="lead">
+              Campora pairs you with classmates heading to the same stop on their scooty or car.
+              Hop on for free, or offer the seat you'd otherwise ride past.
             </p>
-            <div class="d-flex flex-wrap gap-2 mb-4">
+            <div class="d-flex flex-wrap gap-2">
               <a th:if="${me == null}" class="btn btn-lg btn-route" th:href="@{/register}">
-                Get started <i class="bi bi-arrow-right ms-2"></i>
-              </a>
-              <a th:if="${me == null}" class="btn btn-lg btn-hero-secondary" th:href="@{/login}">
-                <i class="bi bi-play-circle me-2"></i>Sign in
+                Find a companion ride <i class="bi bi-arrow-right ms-2"></i>
               </a>
               <a th:if="${me != null}" class="btn btn-lg btn-route" th:href="@{/dashboard}">
                 Open my dashboard <i class="bi bi-arrow-right ms-2"></i>
               </a>
+              <a class="btn btn-lg btn-ghost" href="#how-it-works">See how it works</a>
             </div>
-            <div class="hero-note">
-              <span class="hero-note-icon"><i class="bi bi-shield-check"></i></span>
-              Your details stay private until your ride is confirmed.
+            <div class="hero-proof">
+              <span><i class="bi bi-check-circle-fill"></i>₹0 companion rides</span>
+              <span><i class="bi bi-check-circle-fill"></i>GGV students only</span>
+              <span><i class="bi bi-check-circle-fill"></i>Number shared only after you match</span>
             </div>
           </div>
-          <div class="col-lg-7">
-            <div class="campus-scene" role="img" aria-label="Students sharing a ride from the GGV campus to Rajkishore Nagar">
-              <div class="scene-sun"></div>
-              <div class="scene-campus">
-                <div class="campus-building campus-building-back">
-                  <span class="building-roof"></span>
-                  <span class="building-windows"></span>
+
+          <div class="col-lg-6">
+            <div class="device-stage" role="img"
+                 aria-label="The Campora app showing a free companion ride from Main Gate to Rajkishore Nagar">
+              <div class="device" aria-hidden="true">
+                <div class="device-screen">
+                  <span class="device-notch"></span>
+                  <div class="device-map">
+                    <svg viewBox="0 0 272 300" preserveAspectRatio="xMidYMid slice">
+                      <rect width="272" height="300" fill="#ECEAE2"/>
+                      <g fill="#F7F6F2">
+                        <rect x="-10" y="18" width="110" height="34" rx="8"/>
+                        <rect x="120" y="10" width="70" height="60" rx="8"/>
+                        <rect x="206" y="24" width="80" height="80" rx="8"/>
+                        <rect x="-10" y="96" width="70" height="72" rx="8"/>
+                        <rect x="160" y="120" width="60" height="44" rx="8"/>
+                        <rect x="20" y="196" width="88" height="54" rx="8"/>
+                        <rect x="120" y="230" width="60" height="80" rx="8"/>
+                      </g>
+                      <path d="M60 110 q40 -20 70 10 t60 -6 v40 h-130z" fill="#D7EBDD"/>
+                      <g stroke="#fff" stroke-linecap="round" fill="none">
+                        <path d="M-10 80 H290" stroke-width="12"/>
+                        <path d="M110 -10 V310" stroke-width="10"/>
+                        <path d="M-10 185 C80 175 150 205 290 190" stroke-width="12"/>
+                        <path d="M200 -10 C190 100 230 200 220 310" stroke-width="8"/>
+                      </g>
+                      <path id="heroRoute" class="map-route" d="M44 80 H110 V140 C110 175 150 192 214 190 C219 215 222 240 222 262"
+                            fill="none" stroke="#0B8A5F" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <circle cx="44" cy="80" r="7" fill="#fff" stroke="#0B8A5F" stroke-width="4"/>
+                      <circle cx="222" cy="262" r="8" fill="#0B8A5F"/>
+                      <circle cx="222" cy="262" r="8" fill="none" stroke="#0B8A5F" stroke-width="2">
+                        <animate attributeName="r" values="8;20" dur="2s" repeatCount="indefinite"/>
+                        <animate attributeName="opacity" values=".7;0" dur="2s" repeatCount="indefinite"/>
+                      </circle>
+                      <g>
+                        <circle r="11" fill="#0C1015"/>
+                        <circle r="4.5" fill="#FFC83D"/>
+                        <animateMotion dur="7s" begin="2.4s" repeatCount="indefinite" rotate="auto">
+                          <mpath href="#heroRoute"/>
+                        </animateMotion>
+                      </g>
+                    </svg>
+                    <span class="map-chip from"><i></i>Main Gate</span>
+                    <span class="map-chip to"><i></i>Rajkishore Nagar</span>
+                  </div>
+                  <div class="device-sheet">
+                    <div class="sheet-grip"></div>
+                    <div class="sheet-title"><strong>Going your way</strong><span>Free</span></div>
+                    <div class="ride-row hl">
+                      <span class="ride-av" style="background:#0B8A5F">A</span>
+                      <span class="ride-info"><b>Aarav · Scooty</b><small>5:40 PM · 1 seat left</small></span>
+                      <span class="ride-price">₹0</span>
+                      <span class="ride-cta">Join</span>
+                    </div>
+                    <div class="ride-row">
+                      <span class="ride-av" style="background:#2B50D6">P</span>
+                      <span class="ride-info"><b>Priya · Car</b><small>6:10 PM · 3 seats left</small></span>
+                      <span class="ride-price">₹0</span>
+                      <span class="ride-cta">Join</span>
+                    </div>
+                  </div>
                 </div>
-                <div class="campus-building campus-building-front">
-                  <span class="building-roof"></span>
-                  <span class="building-sign">GGV</span>
-                  <span class="building-windows"></span>
-                </div>
-                <div class="scene-tree scene-tree-left"></div>
-                <div class="scene-tree scene-tree-right"></div>
               </div>
-              <svg class="scene-route" viewBox="0 0 640 360" aria-hidden="true">
-                <path d="M92 94 C220 94 222 180 325 180 S451 105 552 105" fill="none" stroke="#3158ed" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 0"/>
-                <circle cx="92" cy="94" r="8" fill="#3158ed"/>
-                <circle cx="552" cy="105" r="8" fill="#10a99a"/>
-              </svg>
-              <div class="scene-place scene-place-start"><i class="bi bi-geo-alt-fill"></i><span>Engineering Block</span></div>
-              <div class="scene-place scene-place-end"><i class="bi bi-geo-alt-fill"></i><span>Rajkishore Nagar</span></div>
-              <div class="scene-car"><i class="bi bi-car-front-fill"></i></div>
-              <div class="scene-students" aria-hidden="true">
-                <div class="scene-student student-one"><span class="student-head"></span><span class="student-body"></span></div>
-                <div class="scene-student student-two"><span class="student-head"></span><span class="student-body"></span></div>
-                <div class="scene-student student-three"><span class="student-head"></span><span class="student-body"></span></div>
+
+              <div class="float-card fc-confirm" aria-hidden="true">
+                <span class="fc-ico"><i class="bi bi-check-lg"></i></span>
+                <span><b>Seat confirmed</b>Riding with Aarav at 5:40</span>
               </div>
-              <div class="scene-caption">
-                <span class="scene-caption-icon"><i class="bi bi-people-fill"></i></span>
-                <span><strong>Going the same way?</strong><small>Make the trip together.</small></span>
-                <i class="bi bi-arrow-up-right ms-auto"></i>
+              <div class="float-card fc-seats" aria-hidden="true">
+                <span class="fc-ico"><i class="bi bi-people-fill"></i></span>
+                <span><b>2 of 3 seats filled</b>
+                  <span class="seats"><span class="seat on"></span><span class="seat on"></span><span class="seat"></span></span>
+                </span>
               </div>
             </div>
           </div>
@@ -70,99 +110,212 @@
       </div>
     </header>
 
-    <main>
-      <section class="how-section" id="how-it-works">
-        <div class="container">
-          <div class="section-intro text-center">
-            <span class="section-eyebrow">A better way to get there</span>
-            <h2>Getting a ride is easy.</h2>
-            <p>One campus community, one route at a time.</p>
-          </div>
-          <div class="row g-3 g-lg-4 steps-grid">
-            <div class="col-sm-6 col-lg-3">
-              <article class="step-card">
-                <span class="step-icon step-blue"><i class="bi bi-geo-alt-fill"></i></span>
-                <span class="step-number">01</span>
-                <h3>Choose your route</h3>
-                <p>Pick where you are and where you need to go.</p>
-              </article>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <article class="step-card">
-                <span class="step-icon step-purple"><i class="bi bi-people-fill"></i></span>
-                <span class="step-number">02</span>
-                <h3>Join the request</h3>
-                <p>See who else is heading the same way.</p>
-              </article>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <article class="step-card">
-                <span class="step-icon step-teal"><i class="bi bi-car-front-fill"></i></span>
-                <span class="step-number">03</span>
-                <h3>Meet your ride</h3>
-                <p>A driver picks up the shared route request.</p>
-              </article>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-              <article class="step-card">
-                <span class="step-icon step-amber"><i class="bi bi-flag-fill"></i></span>
-                <span class="step-number">04</span>
-                <h3>Reach your stop</h3>
-                <p>Travel together and get on with your day.</p>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
+    <!-- ── Stops ticker ─────────────────────────────────────── -->
+    <div class="ticker" aria-label="Popular routes">
+      <div class="ticker-track">
+        <th:block th:each="pass : ${ {1, 2} }">
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Main Gate <i class="bi bi-arrow-right"></i> Rajkishore Nagar</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Boys Hostel <i class="bi bi-arrow-right"></i> Bilaspur Railway Station</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Engineering Block <i class="bi bi-arrow-right"></i> Nehru Chowk</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Girls Hostel <i class="bi bi-arrow-right"></i> Old Bus Stand</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Central Library <i class="bi bi-arrow-right"></i> Koni Market</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Science Block <i class="bi bi-arrow-right"></i> Sarkanda</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+          <span class="ticker-item" th:attr="aria-hidden=${pass == 2} ? 'true'">Management Block <i class="bi bi-arrow-right"></i> Vyapar Vihar</span><span class="ticker-item" aria-hidden="true"><span class="dot"></span></span>
+        </th:block>
+      </div>
+    </div>
 
-      <section class="community-section" id="students">
-        <div class="container">
-          <div class="row align-items-center g-4 g-lg-5">
-            <div class="col-lg-6">
-              <div class="community-art" aria-hidden="true">
-                <div class="community-orbit orbit-one"></div>
-                <div class="community-orbit orbit-two"></div>
-                <div class="community-center"><i class="bi bi-people-fill"></i></div>
-                <span class="community-bubble bubble-one"><i class="bi bi-geo-alt-fill"></i></span>
-                <span class="community-bubble bubble-two"><i class="bi bi-car-front-fill"></i></span>
-                <span class="community-bubble bubble-three"><i class="bi bi-heart-fill"></i></span>
-                <span class="community-path path-one"></span>
-                <span class="community-path path-two"></span>
+    <main>
+      <!-- ── Companion spotlight ──────────────────────────────── -->
+      <section class="py-4 py-lg-5" id="companion">
+        <div class="spotlight section">
+          <div class="container">
+            <div class="row align-items-center g-5">
+              <div class="col-lg-6 reveal">
+                <span class="section-eyebrow">Companion mode</span>
+                <h2>Got a scooty?<br>Your empty seat just found a friend.</h2>
+                <p class="section-copy mb-4">
+                  Post where you're heading and when you leave. Classmates on the same route join in one tap.
+                  No fares, no commission, no surge. Just students getting each other home.
+                </p>
+                <div class="d-flex flex-wrap align-items-center gap-4">
+                  <span class="free-badge-xl"><b>₹0</b><small>Always free</small></span>
+                  <div class="d-flex flex-column gap-2">
+                    <a th:if="${me == null}" class="btn btn-light btn-lg" th:href="@{/register}">Offer your first ride <i class="bi bi-arrow-right ms-2"></i></a>
+                    <a th:if="${me != null}" class="btn btn-light btn-lg" th:href="@{/dashboard}">Go to companion rides <i class="bi bi-arrow-right ms-2"></i></a>
+                    <a class="btn btn-outline-light-c" href="#how-it-works">How hosting works</a>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-5 offset-lg-1 reveal" data-delay="2">
+                <div class="host-demo" aria-hidden="true">
+                  <div class="section-head mb-3">
+                    <div><div class="label">You're hosting</div><div class="card-title-c">Departs 5:40 PM</div></div>
+                    <span class="pill companion"><i class="bi bi-broadcast"></i>Live</span>
+                  </div>
+                  <div class="route"><div class="stop"><i class="pin"></i><span>Engineering Block</span></div><div class="track"></div><div class="stop"><i class="pin end"></i><span>Nehru Chowk</span></div></div>
+                  <div class="d-flex align-items-center gap-3 my-3">
+                    <div class="seats"><span class="seat fill-in"></span><span class="seat fill-in"></span><span class="seat"></span></div>
+                    <span class="small text-ink-3">Seats filling up</span>
+                  </div>
+                  <ul class="people">
+                    <li><span class="avatar">R</span><div class="flex-grow-1"><div class="fw-semibold text-body">Riya</div><div class="small text-ink-3">CSIT · 3rd sem</div></div><span class="pill completed">Joined</span></li>
+                    <li><span class="avatar">K</span><div class="flex-grow-1"><div class="fw-semibold text-body">Karan</div><div class="small text-ink-3">ECE · 5th sem</div></div><span class="pill completed">Joined</span></li>
+                  </ul>
+                </div>
               </div>
             </div>
-            <div class="col-lg-6">
-              <span class="section-eyebrow">For students</span>
-              <h2>Less waiting at the gate.<br />More time for your day.</h2>
-              <p class="community-copy">Put your destination on the board and let fellow students and verified drivers going your way find you. Prefer to travel with a classmate? Browse companion rides, too.</p>
-              <ul class="benefit-list">
-                <li><i class="bi bi-check-circle-fill"></i>See ride progress as it happens</li>
-                <li><i class="bi bi-check-circle-fill"></i>Find classmates travelling your route</li>
-                <li><i class="bi bi-check-circle-fill"></i>Your contact details are shared after matching</li>
-              </ul>
-              <a th:if="${me == null}" class="btn btn-route" th:href="@{/register}">Find your ride <i class="bi bi-arrow-right ms-2"></i></a>
-              <a th:if="${me != null}" class="btn btn-route" th:href="@{/dashboard}">Go to my rides <i class="bi bi-arrow-right ms-2"></i></a>
+
+            <div class="row g-3 g-lg-4 mt-4 mt-lg-5">
+              <div class="col-md-4 reveal">
+                <article class="feature-dark">
+                  <span class="f-ico"><i class="bi bi-megaphone"></i></span>
+                  <h3>Offer your spare seat</h3>
+                  <p>Set your route, time and seats in under a minute. Riders' numbers show up once they join.</p>
+                </article>
+              </div>
+              <div class="col-md-4 reveal" data-delay="1">
+                <article class="feature-dark">
+                  <span class="f-ico"><i class="bi bi-hand-index-thumb"></i></span>
+                  <h3>Join in one tap</h3>
+                  <p>Rides that match your usual route are flagged for you. Pick your seats and you're in.</p>
+                </article>
+              </div>
+              <div class="col-md-4 reveal" data-delay="2">
+                <article class="feature-dark">
+                  <span class="f-ico"><i class="bi bi-heart"></i></span>
+                  <h3>Free, always</h3>
+                  <p>Companion rides cost nothing. No fares, no commission, no surge, no hidden fees. Ever.</p>
+                </article>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="driver-section" id="drivers">
+      <!-- ── How it works ─────────────────────────────────────── -->
+      <section class="section" id="how-it-works">
         <div class="container">
-          <div class="driver-callout">
-            <span class="driver-callout-icon"><i class="bi bi-steering-wheel"></i></span>
-            <div class="driver-callout-copy">
-              <span class="section-eyebrow">For drivers</span>
-              <h2>See who's heading your way.</h2>
-              <p>View live demand by route, reserve seats, and make each trip count.</p>
-            </div>
-            <a th:if="${me == null}" class="btn btn-light" th:href="@{/register}">Join as a driver <i class="bi bi-arrow-right ms-2"></i></a>
-            <a th:if="${me != null}" class="btn btn-light" th:href="@{/dashboard}">Open dashboard <i class="bi bi-arrow-right ms-2"></i></a>
+          <div class="section-intro text-center reveal">
+            <span class="section-eyebrow">How it works</span>
+            <h2>From the gate to your stop in three steps.</h2>
           </div>
+          <div class="text-center reveal">
+            <div class="mode-switch" role="tablist" aria-label="Ride mode">
+              <button type="button" role="tab" id="tab-companion" aria-selected="true" aria-controls="panel-companion" data-tab="panel-companion">Companion<span class="tag">Free</span></button>
+              <button type="button" role="tab" id="tab-auto" aria-selected="false" aria-controls="panel-auto" data-tab="panel-auto" tabindex="-1">Shared auto</button>
+            </div>
+          </div>
+
+          <div class="row g-3 g-lg-4 mode-panel" id="panel-companion" role="tabpanel" aria-labelledby="tab-companion">
+            <div class="col-md-4 reveal"><article class="step-card"><span class="step-number">01</span><i class="bi bi-signpost-split step-ico"></i>
+              <h3>Pick your route</h3><p>Choose where you are and where you need to be, from hostels to Rajkishore Nagar.</p></article></div>
+            <div class="col-md-4 reveal" data-delay="1"><article class="step-card"><span class="step-number">02</span><i class="bi bi-people step-ico"></i>
+              <h3>Join or host</h3><p>Hop on a classmate's ride going your way, or post your own and let them find you.</p></article></div>
+            <div class="col-md-4 reveal" data-delay="2"><article class="step-card"><span class="step-number">03</span><i class="bi bi-flag step-ico"></i>
+              <h3>Ride together</h3><p>Numbers are shared once you match. Meet at the pickup point and go. No payment needed.</p></article></div>
+          </div>
+
+          <div class="row g-3 g-lg-4 mode-panel" id="panel-auto" role="tabpanel" aria-labelledby="tab-auto" hidden>
+            <div class="col-md-4"><article class="step-card"><span class="step-number">01</span><i class="bi bi-broadcast step-ico"></i>
+              <h3>Put yourself on the board</h3><p>Raise a request for your route. You join everyone else heading the same way.</p></article></div>
+            <div class="col-md-4"><article class="step-card"><span class="step-number">02</span><i class="bi bi-truck-front step-ico"></i>
+              <h3>A driver picks the route</h3><p>Auto and e-rickshaw drivers see where demand is building and reserve seats for your group.</p></article></div>
+            <div class="col-md-4"><article class="step-card"><span class="step-number">03</span><i class="bi bi-geo-alt step-ico"></i>
+              <h3>Track and travel</h3><p>Follow your request from matched to arrived, with the driver's details right on your dashboard.</p></article></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Two ways to ride ─────────────────────────────────── -->
+      <section class="section pt-0" id="modes">
+        <div class="container">
+          <div class="section-intro reveal">
+            <span class="section-eyebrow">Two ways to ride</span>
+            <h2>Free with friends. Fast when you need it.</h2>
+            <p>Start with a companion ride. If nobody's heading your way, a shared auto is one tap away.</p>
+          </div>
+          <div class="row g-4">
+            <div class="col-lg-6 reveal">
+              <article class="mode-card primary">
+                <span class="ribbon">Most loved</span>
+                <span class="icon-badge companion"><i class="bi bi-people-fill"></i></span>
+                <h3>Companion ride</h3>
+                <p class="text-ink-3 mb-0">Ride with a fellow student who's already going.</p>
+                <div class="price">₹0 <small>per ride, forever</small></div>
+                <ul class="check-list">
+                  <li><i class="bi bi-check-circle-fill"></i>Scooty, bike or car, hosted by GGV students</li>
+                  <li><i class="bi bi-check-circle-fill"></i>Rides on your route are flagged for you</li>
+                  <li><i class="bi bi-check-circle-fill"></i>Host or join, from the same account</li>
+                </ul>
+                <a th:href="${me == null} ? @{/register} : @{/dashboard}" class="btn btn-route">Start riding free <i class="bi bi-arrow-right ms-1"></i></a>
+              </article>
+            </div>
+            <div class="col-lg-6 reveal" data-delay="1">
+              <article class="mode-card">
+                <span class="icon-badge student"><i class="bi bi-truck-front-fill"></i></span>
+                <h3>Shared auto</h3>
+                <p class="text-ink-3 mb-0">Pool with batchmates so an auto fills up faster.</p>
+                <div class="price">Pooled <small>pay the driver as usual</small></div>
+                <ul class="check-list">
+                  <li><i class="bi bi-check-circle"></i>Drivers see live demand on your route</li>
+                  <li><i class="bi bi-check-circle"></i>Live status from request to arrival</li>
+                  <li><i class="bi bi-check-circle"></i>Less waiting at the gate</li>
+                </ul>
+                <a th:href="${me == null} ? @{/register} : @{/dashboard}" class="btn btn-ghost">Request a shared auto</a>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Safety ───────────────────────────────────────────── -->
+      <section class="section pt-0" id="safety">
+        <div class="container">
+          <div class="section-intro reveal">
+            <span class="section-eyebrow">Safety &amp; privacy</span>
+            <h2>Built for campus, not strangers.</h2>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-6 col-lg-3 reveal"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-mortarboard"></i></span>
+              <div><h3>Students only</h3><p>Every rider signs up with a GGV enrollment number and department.</p></div></div></div>
+            <div class="col-md-6 col-lg-3 reveal" data-delay="1"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-phone"></i></span>
+              <div><h3>Verified mobile</h3><p>Accounts are confirmed with a one-time code before anyone can ride.</p></div></div></div>
+            <div class="col-md-6 col-lg-3 reveal" data-delay="2"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-incognito"></i></span>
+              <div><h3>Private until matched</h3><p>Your name and number stay hidden until a ride is confirmed.</p></div></div></div>
+            <div class="col-md-6 col-lg-3 reveal" data-delay="3"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-x-circle"></i></span>
+              <div><h3>Leave anytime</h3><p>Plans change. Cancel or leave a ride before it starts, no questions asked.</p></div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Drivers ──────────────────────────────────────────── -->
+      <section class="pb-5" id="drivers">
+        <div class="container reveal">
+          <div class="driver-band">
+            <span class="icon-badge"><i class="bi bi-truck-front-fill"></i></span>
+            <div>
+              <span class="section-eyebrow mb-2" style="color: var(--driver-ink)">For auto &amp; e-rickshaw drivers</span>
+              <h2>See where students are waiting, live.</h2>
+              <p>Spot demand building by route, reserve seats for a whole group and make every trip count.</p>
+            </div>
+            <a th:href="${me == null} ? @{/register} : @{/dashboard}" class="btn btn-route btn-lg">Drive with Campora <i class="bi bi-arrow-right ms-1"></i></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Final CTA ────────────────────────────────────────── -->
+      <section class="cta-final">
+        <div class="container reveal">
+          <h2>The seat next to you is free. Literally.</h2>
+          <p>Join your campus on Campora and make your next ride home a shared one.</p>
+          <a th:if="${me == null}" class="btn btn-lg btn-ink" th:href="@{/register}">Create your free account <i class="bi bi-arrow-right ms-2"></i></a>
+          <a th:if="${me != null}" class="btn btn-lg btn-ink" th:href="@{/dashboard}">Open my dashboard <i class="bi bi-arrow-right ms-2"></i></a>
         </div>
       </section>
     </main>
 
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <footer th:replace="~{fragments/layout :: footerRich}"></footer>
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
   </body>
 </html>
