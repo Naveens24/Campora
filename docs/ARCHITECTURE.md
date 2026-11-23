@@ -104,7 +104,8 @@ request (it becomes `MATCHED`), so demand is never counted twice and auto driver
   login, or Google (OIDC). Email verification is required before a role can be chosen. A Google
   identity links only to an account whose email was already verified.
 * **OTP:** 6 digits from `SecureRandom`, stored only as a SHA-256 hash. It expires after 5 minutes,
-  allows at most 5 attempts, and resends are throttled to one every 30 s.
+  allows at most 5 attempts, and resends are throttled to one every 30 s and
+  five per hour. A password reset needs a verified email and signs the account out everywhere.
 * **Authorisation:** URL rules (`/student/**`, `/companion/**` → STUDENT; `/driver/**` → DRIVER;
   `/admin/**` → ADMIN). Every service also checks ownership (for example, a driver can act only on
   their own trip). Records that aren't the user's return 404, not 403, so their existence isn't leaked.

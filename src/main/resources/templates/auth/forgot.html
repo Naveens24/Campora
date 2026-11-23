@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Forgot password')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container">
+  <div class="auth-wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="card-c accent">
+      <h1 class="h4 mb-2">Forgot your password?</h1>
+      <p class="text-ink-3 mb-4">Enter your account email and we'll send you a code.</p>
+      <form th:action="@{/forgot}" method="post">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-control mb-4" id="email" name="email" type="email" autocomplete="email"
+               placeholder="you@example.com" required autofocus>
+        <button type="submit" class="btn btn-route w-100 py-2">Send code</button>
+      </form>
+      <p class="text-center text-ink-3 mt-4 mb-0"><a th:href="@{/login}">Back to sign in</a></p>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

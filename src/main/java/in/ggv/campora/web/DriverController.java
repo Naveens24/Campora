@@ -72,11 +72,7 @@ public class DriverController {
                           @RequestParam("destinationId") UUID destinationId,
                           @RequestParam("seats") int seats, RedirectAttributes attrs) {
         ReservationResult result = matching.reserveSeats(me.userId(), pickupId, destinationId, seats);
-        String tail = result.hotspotClosed()
-                ? " The hotspot is now closed."
-                : " " + result.seatsStillWaiting() + " seat(s) of demand still waiting for another driver.";
-        Flash.success(attrs, "Reserved " + result.seatsFilled() + " seat(s) for "
-                + result.requestsMatched() + " request(s)." + tail);
+        Flash.success(attrs, result.seatsFilled() == 1 ? "1 seat is yours." : result.seatsFilled() + " seats are yours.");
         return "redirect:/driver";
     }
 

@@ -1,6 +1,9 @@
 # Development profile — zero setup. File-based H2 in PostgreSQL mode,
-# demo data seeded on first start, OTP shown on screen.
+# demo data seeded on first start, OTP shown on screen until mail is configured.
 spring:
+  config:
+    # Your own mail / Google credentials (git-ignored); see campora-local.properties.example
+    import: "optional:file:./campora-local.properties"
   datasource:
     url: jdbc:h2:file:./data/campora-dev;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;AUTO_SERVER=TRUE
     username: sa

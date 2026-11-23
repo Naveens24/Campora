@@ -49,7 +49,7 @@ public class SecurityConfig {
             throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register", "/error", "/error/**",
+                .requestMatchers("/", "/login", "/register", "/forgot", "/reset", "/error", "/error/**",
                         "/css/**", "/js/**", "/img/**", "/webjars/**", "/favicon.svg",
                         "/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/student/**", "/companion/**", "/api/v1/student/**").hasRole("STUDENT")

@@ -81,6 +81,7 @@ enforce the business rules at the database level (see `docs/DATABASE.md`).
 
 Turn on 2-Step Verification for a Google account, create an *App password*, then set
 `MAIL_USERNAME` (the address) and `MAIL_PASSWORD` (the app password, no spaces).
+On your own computer, put them in `campora-local.properties` (copy the `.example` file).
 For another provider also set `MAIL_HOST`, `MAIL_PORT` and `MAIL_FROM`.
 Without these, production sign-ups show "We couldn't send your code".
 

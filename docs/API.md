@@ -16,6 +16,8 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | Method | Path | Purpose |
 |---|---|---|
 | GET/POST | `/verify` | Enter OTP (`code`) |
+| GET/POST | `/forgot` | Email a password reset code (`email`) |
+| GET/POST | `/reset` | Set a new password (`code`, `password`, `confirmPassword`) |
 | POST | `/verify/email` | Set or correct the unverified email |
 | GET/POST | `/onboarding/contact` | Add `mobile` (Google accounts) |
 | GET | `/oauth2/authorization/google` | Google sign-in |

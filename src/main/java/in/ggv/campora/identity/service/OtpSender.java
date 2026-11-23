@@ -7,5 +7,5 @@ import java.time.Duration;
 public interface OtpSender {
 
     /** @throws in.ggv.campora.common.exception.BusinessException when the code could not be sent */
-    void sendOtp(String email, String code, Duration validity);
+    void sendOtp(OtpPurpose purpose, String email, String code, Duration validity);
 }

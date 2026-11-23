@@ -63,29 +63,35 @@
     return input;
   }
 
-  function routeLine(from, to) {
-    const route = el('div', 'route flex-grow-1');
-    const a = el('div', 'stop');
+  function routeStack(from, to) {
+    const route = el('div', 'rs');
+    const a = el('div');
     a.append(el('i', 'pin'), el('span', null, from));
-    const b = el('div', 'stop');
+    const b = el('div');
     b.append(el('i', 'pin end'), el('span', null, to));
-    route.append(a, el('div', 'track'), b);
+    route.append(a, b);
     return route;
   }
 
-  function metric(value, caption) {
-    const m = el('div', 'metric', String(value));
-    m.append(el('small', null, caption));
-    return m;
+  function stepButton(step, label, text) {
+    const b = el('button', null, text);
+    b.type = 'button';
+    b.dataset.step = step;
+    b.setAttribute('aria-label', label);
+    return b;
   }
 
-  function seatBar(count) {
-    const bar = el('div', 'seats mb-3');
-    const shown = Math.min(count, 12);
-    for (let i = 0; i < shown; i++) bar.append(el('span', 'seat on'));
-    if (count > shown) bar.append(el('span', 'seat more', '+' + (count - shown)));
-    return bar;
-  }
+  // Seat steppers (delegated, so cards added later work too)
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-step]');
+    if (!button) return;
+    const input = button.parentElement.querySelector('input');
+    const min = parseInt(input.min || '1', 10);
+    const max = parseInt(input.max || '99', 10);
+    const next = (parseInt(input.value, 10) || min) + parseInt(button.dataset.step, 10);
+    input.value = String(Math.min(max, Math.max(min, next)));
+    input.dataset.touched = '1';
+  });
 
   // ── 3. driver hotspot board ───────────────────────────────────
   const board = document.getElementById('hotspotBoard');
@@ -93,52 +99,55 @@
     const endpoint = board.dataset.endpoint;
     const action = board.dataset.action;
     const refreshMs = Math.max(5, parseInt(board.dataset.refresh || '15', 10)) * 1000;
-    const stamp = document.getElementById('boardStamp');
 
     function renderHotspot(h, capacity, canReserve, generatedAt) {
-      const col = el('div', 'col-12 col-xl-6');
-      const card = el('article', 'hotspot h-100');
-      const head = el('div', 'd-flex align-items-start gap-3 mb-3');
-      head.append(routeLine(h.pickupName, h.destinationName));
-      card.append(head);
+      const card = el('article', 'hs');
+      card.dataset.key = h.pickupId + '|' + h.destinationId;
+      const top = el('div', 'hs-top');
+      const count = el('div', 'hs-count');
+      count.append(el('b', null, String(h.seatsDemanded)), el('span', null, h.seatsDemanded === 1 ? 'seat' : 'seats'));
+      top.append(routeStack(h.pickupName, h.destinationName), count);
 
-      const waited = Math.max(0, Math.round((new Date(generatedAt) - new Date(h.waitingSince)) / 60000));
-      const metrics = el('div', 'd-flex gap-4 mb-3');
-      metrics.append(metric(h.requests, h.requests === 1 ? 'request' : 'requests'),
-                     metric(h.seatsDemanded, 'seats'),
-                     metric(waited + 'm', 'waiting'));
-      card.append(metrics, seatBar(h.seatsDemanded));
+      const waited = Math.max(0, Math.floor((new Date(generatedAt) - new Date(h.waitingSince)) / 60000));
+      const waitText = waited < 1 ? 'Just now' : waited < 60 ? waited + ' min waiting' : Math.floor(waited / 60) + ' h waiting';
+      const meta = el('div', 'hs-meta');
+      const wait = el('span');
+      wait.append(el('i', 'bi bi-clock'), el('span', null, waitText));
+      meta.append(wait);
+      if (h.seatsDemanded >= capacity) meta.append(el('span', 'hs-full', 'Fills your vehicle'));
+      card.append(top, meta);
 
       if (canReserve) {
-        const form = el('form');
+        const form = el('form', 'hs-form');
         form.method = 'post';
         form.action = action;
         form.append(hidden(csrf.name, csrf.token), hidden('pickupId', h.pickupId), hidden('destinationId', h.destinationId));
-        const seats = el('input', 'form-control');
+        const stepper = el('div', 'stepper');
+        const seats = el('input');
         seats.type = 'number';
         seats.name = 'seats';
         seats.min = '1';
         seats.max = String(capacity);
         seats.value = String(Math.min(capacity, h.seatsDemanded));
         seats.setAttribute('aria-label', 'Seats to offer');
-        const button = el('button', 'btn btn-route flex-grow-1');
+        stepper.append(stepButton('-1', 'Fewer seats', '\u2212'), seats, stepButton('1', 'More seats', '+'));
+        const button = el('button', 'btn btn-route', 'Accept');
         button.type = 'submit';
-        button.append(el('i', 'bi bi-check2-circle me-1'), document.createTextNode('Reserve seats'));
-        form.append(seats, button);
+        form.append(stepper, button);
         card.append(form);
       }
-      col.append(card);
-      return col;
+      return card;
     }
 
     function renderEmpty() {
-      const col = el('div', 'col-12');
       const box = el('div', 'card-c empty');
-      box.append(el('i', 'bi bi-signpost-split'), el('div', 'fw-semibold text-body', 'No open demand right now'),
-                 el('div', 'small', 'New hotspots appear here automatically.'));
-      col.append(box);
-      return col;
+      box.append(el('i', 'bi bi-cup-hot'), el('div', 'fw-semibold text-body', 'No one is waiting right now'),
+                 el('div', 'small', 'New routes appear here on their own.'));
+      return box;
     }
+
+    // Keep what the driver has typed or stepped when the board re-renders.
+    board.addEventListener('input', (event) => { event.target.dataset.touched = '1'; });
 
     async function refresh() {
       if (document.hidden) return;
@@ -149,8 +158,21 @@
         const nodes = data.hotspots.length
           ? data.hotspots.map((h) => renderHotspot(h, data.capacity, data.canReserve, data.generatedAt))
           : [renderEmpty()];
+        if (board.contains(document.activeElement) && document.activeElement.matches('input')) return; // mid-edit
+        const chosen = new Map();
+        board.querySelectorAll('.hs input[name="seats"][data-touched]').forEach((i) => chosen.set(i.closest('.hs').dataset.key, i.value));
+        const focused = board.contains(document.activeElement) ? document.activeElement : null;
+        const focusKey = focused?.closest('.hs')?.dataset.key;
+        const focusSel = focused?.dataset.step ? '[data-step="' + focused.dataset.step + '"]' : 'button[type="submit"]';
         board.replaceChildren(...nodes);
-        if (stamp) stamp.textContent = 'Updated ' + new Date(data.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        board.querySelectorAll('.hs').forEach((card) => {
+          const input = card.querySelector('input[name="seats"]');
+          if (input && chosen.has(card.dataset.key)) {
+            input.value = chosen.get(card.dataset.key);
+            input.dataset.touched = '1';
+          }
+          if (focusKey && card.dataset.key === focusKey) card.querySelector(focusSel)?.focus({ preventScroll: true });
+        });
       } catch (e) {
         /* network blip — next tick will retry */
       }
@@ -206,6 +228,11 @@
       next.click();
     });
   });
+
+  // Deep link to a tab, e.g. /companion#panel-offer
+  if (location.hash.length > 1) {
+    Array.from(tabs).find((t) => '#' + t.dataset.tab === location.hash)?.click();
+  }
 
   // ── 4. student live status ────────────────────────────────────
   const watch = document.querySelector('[data-watch-request]');

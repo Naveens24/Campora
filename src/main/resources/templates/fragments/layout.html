@@ -12,7 +12,7 @@
 <head th:fragment="head(title)">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Campora — free companion rides and shared autos for Guru Ghasidas Vishwavidyalaya students.">
+  <meta name="description" content="Campora — companion rides and shared autos for Guru Ghasidas Vishwavidyalaya students.">
   <meta name="theme-color" content="#F7F6F2">
   <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
   <meta name="_csrf_parameter" th:if="${_csrf != null}" th:content="${_csrf.parameterName}">
@@ -34,7 +34,13 @@
     <a class="navbar-brand" th:href="@{/}">
       <img th:src="@{/img/logo.svg}" alt="" width="34" height="34"> Campora
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+    <div class="mini-user" th:if="${me != null and me.ready()}">
+      <span class="avatar" th:text="${#strings.substring(me.firstName(), 0, 1)}" th:title="${me.fullName()}">A</span>
+      <form th:action="@{/logout}" method="post" class="m-0">
+        <button type="submit" class="icon-btn" aria-label="Sign out"><i class="bi bi-box-arrow-right"></i></button>
+      </form>
+    </div>
+    <button th:unless="${me != null and me.ready()}" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
             aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -42,12 +48,12 @@
       <ul class="navbar-nav me-auto ms-lg-3" th:if="${me != null and me.ready()}">
         <th:block th:if="${me.isStudent()}">
           <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/student'} ? 'active'" th:href="@{/student}"><i class="bi bi-geo-alt me-1"></i>Ride</a></li>
-          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/companion'} ? 'active'" th:href="@{/companion}"><i class="bi bi-people me-1"></i>Companion<span class="nav-free">Free</span></a></li>
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/companion'} ? 'active'" th:href="@{/companion}"><i class="bi bi-people me-1"></i>Companion</a></li>
           <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/student/history'} ? 'active'" th:href="@{/student/history}"><i class="bi bi-clock-history me-1"></i>History</a></li>
           <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/student/suggest'} ? 'active'" th:href="@{/student/suggest}"><i class="bi bi-pin-map me-1"></i>Suggest a stop</a></li>
         </th:block>
         <th:block th:if="${me.isDriver()}">
-          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver'} ? 'active'" th:href="@{/driver}"><i class="bi bi-broadcast me-1"></i>Live demand</a></li>
+          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver'} ? 'active'" th:href="@{/driver}"><i class="bi bi-broadcast me-1"></i>Demand</a></li>
           <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver/history'} ? 'active'" th:href="@{/driver/history}"><i class="bi bi-clock-history me-1"></i>Trips</a></li>
         </th:block>
         <th:block th:if="${me.isAdmin()}">
@@ -55,7 +61,7 @@
         </th:block>
       </ul>
       <ul class="navbar-nav me-auto ms-lg-5 public-nav" th:if="${me == null}">
-        <li class="nav-item"><a class="nav-link" th:href="@{/#companion}">Companion mode<span class="nav-free">Free</span></a></li>
+        <li class="nav-item"><a class="nav-link" th:href="@{/#companion}">Companion mode</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/#how-it-works}">How it works</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/#safety}">Safety</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/#drivers}">For drivers</a></li>
@@ -89,56 +95,46 @@
   </div>
   <div class="alert alert-info flash" role="note" th:if="${devOtp != null}">
     <i class="bi bi-code-slash"></i>
-    <div>Dev mode — your OTP is <strong class="mono" th:text="${devOtp}">000000</strong>
-      <span class="small d-block">It is also printed in the server log. Disable with <code>campora.otp.expose-in-ui=false</code>.</span></div>
+    <div>Test mode: no email was sent. Your code is <strong class="mono" th:text="${devOtp}">000000</strong></div>
   </div>
 </div>
 
 <footer th:fragment="footer" class="site-footer" id="contact">
   <div class="container d-flex flex-wrap justify-content-between gap-2">
-    <span><strong>Campora</strong> · Ride together, for free</span>
+    <span><strong>Campora</strong> · Ride together</span>
     <span class="small">Made for Guru Ghasidas Vishwavidyalaya, Bilaspur</span>
   </div>
 </footer>
 
-<footer th:fragment="footerRich" class="footer-rich" id="contact">
+<!-- A div on purpose: "layout :: footer" and ":: nav" also match tag names. -->
+<div th:fragment="richFoot" class="footer-rich" id="contact" role="contentinfo">
   <div class="container">
-    <div class="row g-4">
-      <div class="col-lg-5">
-        <a class="brand" th:href="@{/}"><img th:src="@{/img/logo.svg}" alt="" width="32" height="32"> Campora</a>
-        <p class="text-ink-3 small mt-3 mb-0" style="max-width: 22rem">Campus mobility built by and for students of Guru Ghasidas Vishwavidyalaya, Bilaspur.</p>
-      </div>
-      <div class="col-6 col-lg-2 offset-lg-1">
-        <h4>Product</h4>
-        <ul>
-          <li><a th:href="@{/#companion}">Companion mode</a></li>
-          <li><a th:href="@{/#how-it-works}">How it works</a></li>
-          <li><a th:href="@{/#modes}">Shared autos</a></li>
-        </ul>
-      </div>
-      <div class="col-6 col-lg-2">
-        <h4>Community</h4>
-        <ul>
-          <li><a th:href="@{/#safety}">Safety</a></li>
-          <li><a th:href="@{/#drivers}">For drivers</a></li>
-        </ul>
-      </div>
-      <div class="col-6 col-lg-2">
-        <h4>Account</h4>
-        <ul>
-          <li><a th:href="@{/login}">Sign in</a></li>
-          <li><a th:href="@{/register}">Create account</a></li>
-        </ul>
-      </div>
+    <a class="brand" th:href="@{/}"><img th:src="@{/img/logo.svg}" alt="" width="26" height="26"> Campora</a>
+    <div class="footer-links">
+      <a th:href="@{/#companion}">Companion</a>
+      <a th:href="@{/#how-it-works}">How it works</a>
+      <a th:href="@{/#safety}">Safety</a>
+      <a th:href="@{/#drivers}">Drivers</a>
+      <a th:href="@{/login}">Sign in</a>
     </div>
-    <div class="footer-base">
-      <span>© Campora · Made in Bilaspur</span>
-      <span>Companion rides are free, always.</span>
-    </div>
+    <span class="small text-ink-3">Made for GGV, Bilaspur</span>
   </div>
-</footer>
+</div>
 
 <th:block th:fragment="scripts">
+  <!-- Phone tab bar (a div: "layout :: nav" would match a second nav tag) -->
+  <div class="tabbar" role="navigation" aria-label="Sections" th:if="${me != null and me.ready() and !me.isAdmin()}">
+    <th:block th:if="${me.isStudent()}">
+      <a th:href="@{/student}" th:classappend="${currentPath == '/student'} ? 'active'"><i class="bi bi-geo-alt"></i>Ride</a>
+      <a th:href="@{/companion}" th:classappend="${currentPath == '/companion'} ? 'active'"><i class="bi bi-people"></i>Companion</a>
+      <a th:href="@{/student/history}" th:classappend="${currentPath == '/student/history'} ? 'active'"><i class="bi bi-clock-history"></i>History</a>
+      <a th:href="@{/student/suggest}" th:classappend="${currentPath == '/student/suggest'} ? 'active'"><i class="bi bi-pin-map"></i>Add stop</a>
+    </th:block>
+    <th:block th:if="${me.isDriver()}">
+      <a th:href="@{/driver}" th:classappend="${currentPath == '/driver'} ? 'active'"><i class="bi bi-broadcast"></i>Demand</a>
+      <a th:href="@{/driver/history}" th:classappend="${currentPath == '/driver/history'} ? 'active'"><i class="bi bi-clock-history"></i>Trips</a>
+    </th:block>
+  </div>
   <script th:src="@{/webjars/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js}" defer></script>
   <script th:src="@{/js/campora.js}" defer></script>
 </th:block>
@@ -148,6 +144,12 @@
   <div class="stop"><i class="pin"></i><span th:text="${from}">From</span></div>
   <div class="track"></div>
   <div class="stop"><i class="pin end"></i><span th:text="${to}">To</span></div>
+</div>
+
+<!-- Reusable: route as two stacked lines; long names wrap instead of being cut -->
+<div th:fragment="routeStack(from, to)" class="rs">
+  <div><i class="pin"></i><span th:text="${from}">From</span></div>
+  <div><i class="pin end"></i><span th:text="${to}">To</span></div>
 </div>
 
 <!-- Reusable: grouped stop <select> options -->

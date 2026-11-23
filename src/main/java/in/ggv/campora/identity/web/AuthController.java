@@ -30,6 +30,8 @@ public class AuthController {
 
     private final AccountService accounts;
     private final AuthenticationRefresher refresher;
+    private final boolean mailEnabled;
+    /** Test mode only: never while real emails go out. */
     private final boolean exposeOtp;
     private final boolean demoAccounts;
     private final boolean googleEnabled;
@@ -37,7 +39,8 @@ public class AuthController {
     public AuthController(AccountService accounts, AuthenticationRefresher refresher, CamporaProperties properties) {
         this.accounts = accounts;
         this.refresher = refresher;
-        this.exposeOtp = properties.otp().exposeInUi();
+        this.mailEnabled = !properties.mail().from().isBlank();
+        this.exposeOtp = properties.otp().exposeInUi() && !mailEnabled;
         this.demoAccounts = properties.seedDemoData();
         this.googleEnabled = properties.google().enabled();
     }
@@ -94,6 +97,7 @@ public class AuthController {
             return "redirect:/dashboard";
         }
         model.addAttribute("email", me.email());
+        model.addAttribute("mailEnabled", mailEnabled);
         return "auth/verify";
     }
 
@@ -128,9 +132,10 @@ public class AuthController {
 
     private void sendCode(CamporaUserDetails me, RedirectAttributes attrs) {
         OtpService.IssuedOtp otp = accounts.sendVerificationCode(me.userId());
-        Flash.success(attrs, "We sent a 6-digit code to " + me.email() + ".");
         if (exposeOtp) {
             attrs.addFlashAttribute("devOtp", otp.code());
+        } else {
+            Flash.success(attrs, "We sent a 6-digit code to " + me.email() + ".");
         }
     }
 }

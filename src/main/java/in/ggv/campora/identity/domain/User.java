@@ -143,6 +143,10 @@ public class User extends BaseEntity {
         return mobileNumber;
     }
 
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }

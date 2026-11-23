@@ -1,0 +1,7 @@
+# Template only: do NOT put real values here, this file is in git.
+# Copy to campora-local.properties (git-ignored), fill in there, restart the app.
+MAIL_USERNAME=you@gmail.com
+MAIL_PASSWORD=gmail-app-password-without-spaces
+# Optional: Google sign-in
+#GOOGLE_CLIENT_ID=
+#GOOGLE_CLIENT_SECRET=

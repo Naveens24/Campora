@@ -8,7 +8,7 @@
     <div th:replace="~{fragments/layout :: flash}"></div>
     <div class="card-c accent">
       <div class="kicker">Welcome back</div>
-      <h1 class="h3 mb-4">Sign in to Campora</h1>
+      <h1 class="h4 mb-3">Sign in to Campora</h1>
 
       <div class="alert alert-danger flash" role="alert" th:if="${param.error != null}">
         <i class="bi bi-exclamation-triangle-fill"></i><div>Wrong email, mobile number or password.</div>
@@ -30,7 +30,10 @@
                  autocomplete="username" autocapitalize="none" placeholder="you@example.com" required autofocus>
         </div>
         <div class="mb-4">
-          <label class="form-label" for="password">Password</label>
+          <div class="d-flex justify-content-between align-items-baseline">
+            <label class="form-label" for="password">Password</label>
+            <a class="link-quiet" th:href="@{/forgot}">Forgot password?</a>
+          </div>
           <input class="form-control" id="password" name="password" type="password"
                  autocomplete="current-password" required>
         </div>

@@ -64,7 +64,7 @@ public class AccountService {
         if (user.getEmail() == null) {
             throw new BusinessException("Add your email address first.");
         }
-        return otpService.issue(user.getEmail());
+        return otpService.issue(OtpPurpose.VERIFY_EMAIL, user.getEmail());
     }
 
     public void verifyEmail(UUID userId, String code) {
@@ -75,8 +75,31 @@ public class AccountService {
         if (user.getEmail() == null) {
             throw new BusinessException("Add your email address first.");
         }
-        otpService.verify(user.getEmail(), code);
+        otpService.verify(OtpPurpose.VERIFY_EMAIL, user.getEmail(), code);
         user.markEmailVerified(clock.instant());
+    }
+
+    /**
+     * Emails a reset code, or does nothing when no usable account has proven this address.
+     * No transaction: sending mail must not hold a database connection.
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public Optional<OtpService.IssuedOtp> sendPasswordReset(String rawEmail) {
+        return resettable(normalizeEmail(rawEmail))
+                .map(user -> otpService.issue(OtpPurpose.RESET_PASSWORD, user.getEmail()));
+    }
+
+    public UUID resetPassword(String rawEmail, String code, String newPassword) {
+        User user = resettable(normalizeEmail(rawEmail))
+                .orElseThrow(() -> new BusinessException("The code has expired. Please request a new one."));
+        otpService.verify(OtpPurpose.RESET_PASSWORD, user.getEmail(), code);
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        return user.getId();
+    }
+
+    private Optional<User> resettable(String email) {
+        return users.findByEmail(email)
+                .filter(user -> user.isEmailVerified() && user.getStatus() != UserStatus.SUSPENDED);
     }
 
     /** Finds, links or creates the account for a Google identity whose email Google has verified. */

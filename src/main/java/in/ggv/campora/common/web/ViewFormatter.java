@@ -70,6 +70,12 @@ public class ViewFormatter {
         return (minutes / 60) + " h ago";
     }
 
+    /** How long someone has been waiting: "Just now", "4 min", "2 h". */
+    public String waiting(Instant since) {
+        String ago = ago(since);
+        return ago.equals("just now") ? "Just now" : ago.replace(" ago", " waiting");
+    }
+
     /** Minutes until an instant, never negative. */
     public long minutesUntil(Instant instant) {
         return instant == null ? 0 : Math.max(0, Duration.between(clock.instant(), instant).toMinutes());
