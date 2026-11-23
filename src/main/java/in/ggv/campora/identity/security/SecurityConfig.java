@@ -2,6 +2,7 @@ package in.ggv.campora.identity.security;
 
 import java.util.Map;
 
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DisabledException;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
@@ -20,7 +22,7 @@ import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWrite
 /**
  * Security model
  * <ul>
- *   <li>Form login with mobile number + BCrypt password; OTP verifies the number.</li>
+ *   <li>Form login (email or mobile + BCrypt password) with emailed OTP, or Google sign-in.</li>
  *   <li>Role-based URL rules: /student & /companion → STUDENT, /driver → DRIVER, /admin → ADMIN.</li>
  *   <li>CSRF on for every form; strict CSP, no framing, no referrer leaks off-site.</li>
  * </ul>
@@ -41,7 +43,9 @@ public class SecurityConfig {
             "base-uri 'self'");
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository)
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository,
+                                                   ObjectProvider<ClientRegistrationRepository> googleClient,
+                                                   GoogleLoginHandler googleLogin)
             throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
@@ -69,6 +73,12 @@ public class SecurityConfig {
                 .contentSecurityPolicy(csp -> csp.policyDirectives(CSP))
                 .referrerPolicy(ref -> ref.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                 .frameOptions(frame -> frame.deny()));
+        if (googleClient.getIfAvailable() != null) {
+            http.oauth2Login(oauth -> oauth
+                .loginPage("/login")
+                .successHandler(googleLogin)
+                .failureUrl("/login?google"));
+        }
         return http.build();
     }
 

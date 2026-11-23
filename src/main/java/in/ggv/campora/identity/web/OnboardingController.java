@@ -16,6 +16,7 @@ import in.ggv.campora.common.web.Flash;
 import in.ggv.campora.identity.domain.RoleName;
 import in.ggv.campora.identity.security.AuthenticationRefresher;
 import in.ggv.campora.identity.security.CamporaUserDetails;
+import in.ggv.campora.identity.service.AccountService;
 import in.ggv.campora.identity.service.OnboardingService;
 import in.ggv.campora.profile.domain.VehicleType;
 import in.ggv.campora.web.form.DriverProfileForm;
@@ -29,21 +30,39 @@ import jakarta.validation.Valid;
 @RequestMapping("/onboarding")
 public class OnboardingController {
 
+    private final AccountService accounts;
     private final OnboardingService onboarding;
     private final CampusService campus;
     private final AuthenticationRefresher refresher;
 
-    public OnboardingController(OnboardingService onboarding, CampusService campus,
+    public OnboardingController(AccountService accounts, OnboardingService onboarding, CampusService campus,
                                 AuthenticationRefresher refresher) {
+        this.accounts = accounts;
         this.onboarding = onboarding;
         this.campus = campus;
         this.refresher = refresher;
     }
 
+    @GetMapping("/contact")
+    public String contactPage(@AuthenticationPrincipal CamporaUserDetails me) {
+        return me.verified() && me.mobile() == null ? "onboarding/contact" : "redirect:/onboarding/role";
+    }
+
+    @PostMapping("/contact")
+    public String saveContact(@AuthenticationPrincipal CamporaUserDetails me, @RequestParam("mobile") String mobile,
+                              HttpServletRequest request, HttpServletResponse response) {
+        accounts.setMobile(me.userId(), mobile);
+        refresher.signIn(me.userId(), request, response);
+        return "redirect:/onboarding/role";
+    }
+
     @GetMapping("/role")
     public String rolePage(@AuthenticationPrincipal CamporaUserDetails me) {
-        if (!me.mobileVerified()) {
+        if (!me.verified()) {
             return "redirect:/verify";
+        }
+        if (me.mobile() == null) {
+            return "redirect:/onboarding/contact";
         }
         return me.role() == null ? "onboarding/role" : "redirect:/onboarding/profile";
     }
@@ -52,7 +71,7 @@ public class OnboardingController {
     public String chooseRole(@AuthenticationPrincipal CamporaUserDetails me, @RequestParam("role") RoleName role,
                              HttpServletRequest request, HttpServletResponse response) {
         onboarding.chooseRole(me.userId(), role);
-        refresher.signIn(me.mobile(), request, response);
+        refresher.signIn(me.userId(), request, response);
         return "redirect:/onboarding/profile";
     }
 
@@ -80,8 +99,8 @@ public class OnboardingController {
         if (result.hasErrors()) {
             return studentPage(model);
         }
-        onboarding.createStudentProfile(me.userId(), form.getDepartmentId(), form.getEnrollmentNo(), form.getSemester());
-        refresher.signIn(me.mobile(), request, response);
+        onboarding.createStudentProfile(me.userId(), form.getDepartmentId(), form.getSemester());
+        refresher.signIn(me.userId(), request, response);
         Flash.success(attrs, "Welcome aboard, " + me.firstName() + "! Where are you heading?");
         return "redirect:/student";
     }
@@ -96,8 +115,8 @@ public class OnboardingController {
         }
         onboarding.createDriverProfile(me.userId(), form.getVehicleType(), form.getVehicleNumber(),
                 form.getSeatCapacity(), form.getNativeArea());
-        refresher.signIn(me.mobile(), request, response);
-        Flash.success(attrs, "Profile saved. The transport office will verify your vehicle shortly.");
+        refresher.signIn(me.userId(), request, response);
+        Flash.success(attrs, "You're all set! Go online to start taking rides.");
         return "redirect:/driver";
     }
 

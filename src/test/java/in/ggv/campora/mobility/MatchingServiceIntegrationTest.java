@@ -184,7 +184,7 @@ class MatchingServiceIntegrationTest {
     private UUID raiseRequest(int seats, RequestType type) {
         User user = user(RoleName.STUDENT);
         StudentProfile student = students.save(new StudentProfile(user,
-                departments.findByCode("MCA").orElseThrow(), "T/" + user.getMobileNumber(), 3));
+                departments.findByCode("MCA").orElseThrow(), 3));
         return requests.save(new TravelRequest(student, pickup, destination, type, seats,
                 clock.instant().plus(Duration.ofMinutes(30)))).getId();
     }
@@ -192,7 +192,6 @@ class MatchingServiceIntegrationTest {
     private UUID driverUser(int capacity) {
         User user = user(RoleName.DRIVER);
         DriverProfile driver = new DriverProfile(user, VehicleType.AUTO, "CG" + user.getMobileNumber(), capacity, null);
-        driver.verify();
         driver.setAvailability(Availability.ONLINE);
         drivers.save(driver);
         return user.getId();
@@ -200,7 +199,7 @@ class MatchingServiceIntegrationTest {
 
     private User user(RoleName role) {
         String mobile = "7" + String.format("%09d", SEQ.incrementAndGet() * 7L);
-        User user = new User("Test", role.name(), mobile, encoder.encode("password1"));
+        User user = new User("Test", role.name(), null, mobile, encoder.encode("password1"));
         user.markMobileVerified(clock.instant());
         user.assignRole(roles.findByName(role).orElseThrow());
         return users.save(user);

@@ -8,3 +8,8 @@ campora:
   seed-demo-data: false
   otp:
     expose-in-ui: true
+  mail:
+    from: ""
+  google:
+    client-id: test-client
+    client-secret: test-secret

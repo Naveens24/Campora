@@ -42,10 +42,10 @@ student_profile 1───∞ destination_request
 | Table | Key columns | Notes |
 |---|---|---|
 | `app_role` | `name` (STUDENT/DRIVER/ADMIN) | |
-| `app_user` | `role_id?`, `first_name`, `last_name`, `mobile_number` ⋆unique, `password_hash`, `status`, `mobile_verified_at` | `role_id` is null until onboarding |
+| `app_user` | `role_id?`, `first_name`, `last_name`, `email?` ⋆unique, `email_verified_at`, `google_subject?` ⋆unique, `mobile_number?` ⋆unique, `password_hash?`, `status`, `mobile_verified_at` | `role_id` is null until onboarding |
 | `department` | `code` ⋆unique, `name`, `active` | |
 | `destination` | `name` ⋆unique, `area`, `type` (CAMPUS_POINT/CITY), `active`, `sort_order` | Used for both pickup and destination |
-| `student_profile` | `user_id` ⋆unique, `department_id`, `enrollment_no` ⋆unique, `semester` | |
+| `student_profile` | `user_id` ⋆unique, `department_id`, `enrollment_no?` (legacy), `semester` | |
 | `driver_profile` | `user_id` ⋆unique, `vehicle_type`, `vehicle_number` ⋆unique, `seat_capacity`, `native_area`, `availability`, `verified` | |
 | `travel_request` | `student_id`, `pickup_id`, `destination_id`, `request_type`, `seats_required`, `status`, `expires_at` | a.k.a. MobilityRequest |
 | `driver_response` | `request_id`, `driver_id`, `trip_id`, `seats_reserved`, `status` | ≤ 1 ACCEPTED per request |

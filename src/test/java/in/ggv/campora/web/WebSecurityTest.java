@@ -49,6 +49,7 @@ class WebSecurityTest {
         mvc.perform(post("/register").with(csrf())
                         .param("firstName", "Test")
                         .param("lastName", "Student")
+                        .param("email", "test.student@example.com")
                         .param("mobile", "9123456780")
                         .param("password", "password123")
                         .param("confirmPassword", "password123"))

@@ -397,6 +397,9 @@ code { color: var(--companion-ink); font-size: .85em; }
 .auth-wrap .card-c { padding: clamp(1.5rem, 4vw, 2.4rem); }
 .auth-wrap h1 { letter-spacing: -.035em; }
 
+.or-rule { display: flex; align-items: center; gap: .8rem; margin: 1.2rem 0; color: var(--ink-3); font-size: .85rem; }
+.or-rule::before, .or-rule::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
 /* ── footer ──────────────────────────────────────────────────── */
 .site-footer {
   margin-top: 3rem; padding: 1.5rem 0; border-top: 1px solid var(--line);
@@ -417,12 +420,6 @@ code { color: var(--companion-ink); font-size: .85em; }
 }
 .companion-banner h1 { color: #fff; font-size: clamp(1.5rem, 3vw, 2.1rem); margin: .4rem 0 .25rem; letter-spacing: -.035em; }
 .companion-banner p { margin: 0; max-width: 40rem; }
-.companion-banner .free-tag { position: relative; z-index: 1; margin-left: auto; }
-.free-tag {
-  display: inline-flex; align-items: baseline; gap: .35rem; padding: .55rem 1rem; border-radius: 14px;
-  background: var(--sun); color: var(--ink); font-weight: 700; font-size: 1.5rem; letter-spacing: -.03em; line-height: 1;
-}
-.free-tag small { font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
 .eyebrow-pill {
   display: inline-flex; align-items: center; gap: .45rem; padding: .3rem .75rem .3rem .35rem; border-radius: 999px;
   font-size: .78rem; font-weight: 500; background: #fff; color: var(--ink); border: 1px solid var(--line);
@@ -522,7 +519,6 @@ code { color: var(--companion-ink); font-size: .85em; }
 .ride-info small { color: var(--ink-3); font-size: .66rem; }
 .ride-cta { flex: 0 0 auto; padding: .3rem .65rem; border-radius: 999px; background: var(--ink); color: #fff; font-size: .66rem; font-weight: 600; }
 .ride-row.hl .ride-cta { background: var(--companion); }
-.ride-price { color: var(--companion-ink); font-weight: 700; font-size: .72rem; }
 
 .float-card {
   position: absolute; z-index: 3; display: flex; align-items: center; gap: .7rem; padding: .75rem .95rem;
@@ -650,8 +646,6 @@ code { color: var(--companion-ink); font-size: .85em; }
   background: var(--sun); color: var(--ink); font-size: .68rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
 }
 .mode-card h3 { font-size: 1.4rem; font-weight: 600; margin: 1.2rem 0 .35rem; letter-spacing: -.03em; }
-.mode-card .price { font-size: 2.6rem; font-weight: 700; color: var(--ink); letter-spacing: -.05em; line-height: 1; margin: 1.1rem 0 .2rem; }
-.mode-card .price small { font-size: .85rem; font-weight: 500; color: var(--ink-3); letter-spacing: 0; }
 .check-list { list-style: none; padding: 0; margin: 1.4rem 0 1.6rem; }
 .check-list li { display: flex; gap: .7rem; padding: .5rem 0; color: var(--ink-2); font-size: .93rem; }
 .check-list i { color: var(--companion); flex: 0 0 auto; }
@@ -710,7 +704,6 @@ code { color: var(--companion-ink); font-size: .85em; }
   .float-card { font-size: .72rem; padding: .6rem .7rem; }
   .fc-confirm { right: -4px; top: 6%; }
   .fc-seats { left: -4px; bottom: 6%; }
-  .companion-banner .free-tag { margin-left: 0; }
   .mode-switch button { padding: .5rem .8rem; font-size: .82rem; }
 }
 

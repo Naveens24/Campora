@@ -26,19 +26,15 @@ public class StudentProfile extends BaseEntity {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
-    @Column(name = "enrollment_no", nullable = false, unique = true, length = 32)
-    private String enrollmentNo;
-
     @Column(name = "semester", nullable = false)
     private int semester;
 
     protected StudentProfile() {
     }
 
-    public StudentProfile(User user, Department department, String enrollmentNo, int semester) {
+    public StudentProfile(User user, Department department, int semester) {
         this.user = user;
         this.department = department;
-        this.enrollmentNo = enrollmentNo;
         this.semester = semester;
     }
 
@@ -48,10 +44,6 @@ public class StudentProfile extends BaseEntity {
 
     public Department getDepartment() {
         return department;
-    }
-
-    public String getEnrollmentNo() {
-        return enrollmentNo;
     }
 
     public int getSemester() {

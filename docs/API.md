@@ -16,10 +16,13 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | Method | Path | Purpose |
 |---|---|---|
 | GET/POST | `/verify` | Enter OTP (`code`) |
+| POST | `/verify/email` | Set or correct the unverified email |
+| GET/POST | `/onboarding/contact` | Add `mobile` (Google accounts) |
+| GET | `/oauth2/authorization/google` | Google sign-in |
 | POST | `/verify/resend` | New OTP (throttled) |
 | GET/POST | `/onboarding/role` | Choose `STUDENT` or `DRIVER` |
 | GET | `/onboarding/profile` | Profile form for the chosen role |
-| POST | `/onboarding/profile/student` | `departmentId`, `enrollmentNo`, `semester` |
+| POST | `/onboarding/profile/student` | `departmentId`, `semester` |
 | POST | `/onboarding/profile/driver` | `vehicleType`, `vehicleNumber`, `seatCapacity`, `nativeArea` |
 | GET | `/dashboard` | Redirects to the role console |
 
@@ -41,7 +44,7 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/driver` | Availability, current trip, hotspot board |
-| POST | `/driver/availability` | `online=true/false` (verified drivers only) |
+| POST | `/driver/availability` | `online=true/false` (unless blocked) |
 | POST | `/driver/reserve` | `pickupId`, `destinationId`, `seats` |
 | POST | `/driver/trips/{id}/start` · `/complete` · `/cancel` | Trip lifecycle |
 | GET | `/driver/history` | Past trips |
@@ -50,7 +53,7 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/admin` | Stats, drivers, suggestions, network, departments |
-| POST | `/admin/drivers/{id}/verify` · `/revoke` | Driver verification |
+| POST | `/admin/drivers/{id}/verify` · `/revoke` | Unblock / block a driver |
 | POST | `/admin/suggestions/{id}/approve` (`type`) · `/reject` (`note`) | Review stop suggestions |
 | POST | `/admin/locations` · `/admin/locations/{id}/toggle` | Stop network |
 | POST | `/admin/departments` · `/admin/departments/{id}/toggle` | Departments |

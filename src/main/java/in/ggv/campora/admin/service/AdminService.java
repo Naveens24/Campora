@@ -28,7 +28,7 @@ import in.ggv.campora.profile.repository.DriverProfileRepository;
 import in.ggv.campora.trip.domain.TripStatus;
 import in.ggv.campora.trip.repository.TripRepository;
 
-/** Transport-office console: platform health and driver verification. */
+/** Transport-office console: platform health and driver access. */
 @Service
 public class AdminService {
 
@@ -60,7 +60,6 @@ public class AdminService {
         return new AdminStats(
                 users.countByRole(RoleName.STUDENT),
                 users.countByRole(RoleName.DRIVER),
-                drivers.countByVerifiedFalse(),
                 drivers.countByAvailabilityAndVerifiedTrue(Availability.ONLINE),
                 requests.countByStatus(RequestStatus.OPEN),
                 trips.countByStatusIn(TripStatus.ACTIVE),

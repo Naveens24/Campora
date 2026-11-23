@@ -48,8 +48,11 @@ public class OnboardingService {
             throw new BusinessException("Please choose Student or Driver.");
         }
         User user = requireUser(userId);
-        if (!user.isMobileVerified()) {
-            throw new BusinessException("Verify your mobile number first.");
+        if (!user.isVerified()) {
+            throw new BusinessException("Verify your email first.");
+        }
+        if (user.getMobileNumber() == null) {
+            throw new BusinessException("Add your mobile number first.");
         }
         if (hasProfile(user)) {
             throw new BusinessException("Your role is already set up.");
@@ -58,17 +61,13 @@ public class OnboardingService {
         user.assignRole(role);
     }
 
-    public void createStudentProfile(UUID userId, UUID departmentId, String enrollmentNo, int semester) {
+    public void createStudentProfile(UUID userId, UUID departmentId, int semester) {
         User user = requireUserWithRole(userId, RoleName.STUDENT);
         if (students.existsByUserId(userId)) {
             throw new BusinessException("Your student profile already exists.");
         }
-        String enrollment = enrollmentNo.trim().toUpperCase(Locale.ROOT);
-        if (students.existsByEnrollmentNoIgnoreCase(enrollment)) {
-            throw new BusinessException("Enrollment number " + enrollment + " is already registered.");
-        }
         Department department = campus.requireActiveDepartment(departmentId);
-        students.save(new StudentProfile(user, department, enrollment, semester));
+        students.save(new StudentProfile(user, department, semester));
     }
 
     public void createDriverProfile(UUID userId, VehicleType vehicleType, String vehicleNumber,

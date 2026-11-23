@@ -25,8 +25,8 @@
               <a class="btn btn-lg btn-ghost" href="#how-it-works">See how it works</a>
             </div>
             <div class="hero-proof">
-              <span><i class="bi bi-check-circle-fill"></i>₹0 companion rides</span>
-              <span><i class="bi bi-check-circle-fill"></i>GGV students only</span>
+              <span><i class="bi bi-check-circle-fill"></i>Free companion rides</span>
+              <span><i class="bi bi-check-circle-fill"></i>Made for GGV students</span>
               <span><i class="bi bi-check-circle-fill"></i>Number shared only after you match</span>
             </div>
           </div>
@@ -81,13 +81,11 @@
                     <div class="ride-row hl">
                       <span class="ride-av" style="background:#0B8A5F">A</span>
                       <span class="ride-info"><b>Aarav · Scooty</b><small>5:40 PM · 1 seat left</small></span>
-                      <span class="ride-price">₹0</span>
                       <span class="ride-cta">Join</span>
                     </div>
                     <div class="ride-row">
                       <span class="ride-av" style="background:#2B50D6">P</span>
                       <span class="ride-info"><b>Priya · Car</b><small>6:10 PM · 3 seats left</small></span>
-                      <span class="ride-price">₹0</span>
                       <span class="ride-cta">Join</span>
                     </div>
                   </div>
@@ -136,10 +134,10 @@
                 <h2>Got a scooty?<br>Your empty seat just found a friend.</h2>
                 <p class="section-copy mb-4">
                   Post where you're heading and when you leave. Classmates on the same route join in one tap.
-                  No fares, no commission, no surge. Just students getting each other home.
+                  Just students getting each other home.
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-4">
-                  <span class="free-badge-xl"><b>₹0</b><small>Always free</small></span>
+                  <span class="free-badge-xl"><b>Free</b><small>Always</small></span>
                   <div class="d-flex flex-column gap-2">
                     <a th:if="${me == null}" class="btn btn-light btn-lg" th:href="@{/register}">Offer your first ride <i class="bi bi-arrow-right ms-2"></i></a>
                     <a th:if="${me != null}" class="btn btn-light btn-lg" th:href="@{/dashboard}">Go to companion rides <i class="bi bi-arrow-right ms-2"></i></a>
@@ -185,7 +183,7 @@
                 <article class="feature-dark">
                   <span class="f-ico"><i class="bi bi-heart"></i></span>
                   <h3>Free, always</h3>
-                  <p>Companion rides cost nothing. No fares, no commission, no surge, no hidden fees. Ever.</p>
+                  <p>Companion mode is free for every student. Just share the trip and the company.</p>
                 </article>
               </div>
             </div>
@@ -213,7 +211,7 @@
             <div class="col-md-4 reveal" data-delay="1"><article class="step-card"><span class="step-number">02</span><i class="bi bi-people step-ico"></i>
               <h3>Join or host</h3><p>Hop on a classmate's ride going your way, or post your own and let them find you.</p></article></div>
             <div class="col-md-4 reveal" data-delay="2"><article class="step-card"><span class="step-number">03</span><i class="bi bi-flag step-ico"></i>
-              <h3>Ride together</h3><p>Numbers are shared once you match. Meet at the pickup point and go. No payment needed.</p></article></div>
+              <h3>Ride together</h3><p>Numbers are shared once you match. Meet at the pickup point and go.</p></article></div>
           </div>
 
           <div class="row g-3 g-lg-4 mode-panel" id="panel-auto" role="tabpanel" aria-labelledby="tab-auto" hidden>
@@ -242,7 +240,6 @@
                 <span class="icon-badge companion"><i class="bi bi-people-fill"></i></span>
                 <h3>Companion ride</h3>
                 <p class="text-ink-3 mb-0">Ride with a fellow student who's already going.</p>
-                <div class="price">₹0 <small>per ride, forever</small></div>
                 <ul class="check-list">
                   <li><i class="bi bi-check-circle-fill"></i>Scooty, bike or car, hosted by GGV students</li>
                   <li><i class="bi bi-check-circle-fill"></i>Rides on your route are flagged for you</li>
@@ -256,7 +253,6 @@
                 <span class="icon-badge student"><i class="bi bi-truck-front-fill"></i></span>
                 <h3>Shared auto</h3>
                 <p class="text-ink-3 mb-0">Pool with batchmates so an auto fills up faster.</p>
-                <div class="price">Pooled <small>pay the driver as usual</small></div>
                 <ul class="check-list">
                   <li><i class="bi bi-check-circle"></i>Drivers see live demand on your route</li>
                   <li><i class="bi bi-check-circle"></i>Live status from request to arrival</li>
@@ -274,15 +270,15 @@
         <div class="container">
           <div class="section-intro reveal">
             <span class="section-eyebrow">Safety &amp; privacy</span>
-            <h2>Built for campus, not strangers.</h2>
+            <h2>Built around your campus.</h2>
           </div>
           <div class="row g-3">
             <div class="col-md-6 col-lg-3 reveal"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-mortarboard"></i></span>
-              <div><h3>Students only</h3><p>Every rider signs up with a GGV enrollment number and department.</p></div></div></div>
-            <div class="col-md-6 col-lg-3 reveal" data-delay="1"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-phone"></i></span>
-              <div><h3>Verified mobile</h3><p>Accounts are confirmed with a one-time code before anyone can ride.</p></div></div></div>
+              <div><h3>Made for GGV</h3><p>Built around the departments, hostels and stops students use every day.</p></div></div></div>
+            <div class="col-md-6 col-lg-3 reveal" data-delay="1"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-envelope-check"></i></span>
+              <div><h3>Verified email</h3><p>Accounts are confirmed with a one-time code before anyone can ride.</p></div></div></div>
             <div class="col-md-6 col-lg-3 reveal" data-delay="2"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-incognito"></i></span>
-              <div><h3>Private until matched</h3><p>Your name and number stay hidden until a ride is confirmed.</p></div></div></div>
+              <div><h3>Private until matched</h3><p>Your phone number stays hidden until a ride is confirmed.</p></div></div></div>
             <div class="col-md-6 col-lg-3 reveal" data-delay="3"><div class="safety-card flex-column"><span class="icon-badge companion"><i class="bi bi-x-circle"></i></span>
               <div><h3>Leave anytime</h3><p>Plans change. Cancel or leave a ride before it starts, no questions asked.</p></div></div></div>
           </div>

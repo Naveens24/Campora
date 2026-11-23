@@ -39,9 +39,9 @@ public class DriverProfile extends BaseEntity {
     @Column(name = "availability", nullable = false, length = 12)
     private Availability availability = Availability.OFFLINE;
 
-    /** Only admin-verified drivers can see demand and reserve seats. */
+    /** Approved on registration; false only after an admin blocks the driver. */
     @Column(name = "verified", nullable = false)
-    private boolean verified = false;
+    private boolean verified = true;
 
     protected DriverProfile() {
     }

@@ -119,7 +119,7 @@ public class MatchingService {
 
     private void assertCanReserve(DriverProfile driver, int seats) {
         if (!driver.isVerified()) {
-            throw new BusinessException("Your account is awaiting verification by the transport office.");
+            throw new BusinessException("Your driver account is blocked. Contact the transport office.");
         }
         if (!driver.isOnline()) {
             throw new BusinessException("Go online to accept rides.");

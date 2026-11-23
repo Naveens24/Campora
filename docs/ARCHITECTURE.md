@@ -28,7 +28,7 @@
 
 **Patterns used:** layered architecture, repository, service, DTO, and a rich domain model with
 guarded transitions. SOLID applies throughout: `SeatAllocator` is a pure policy class, and
-`SmsGateway` is an interface with a pluggable implementation.
+`OtpSender` sends through SMTP when configured (see README).
 
 ## 2. The demand engine (`mobility.service.MatchingService`)
 
@@ -51,7 +51,7 @@ every 15 s through `/api/v1/driver/hotspots`, and polling pauses while the brows
 ```
 reserveSeats(driver, route, seats)
  1. lock driver row                       → stops a double-clicked "Reserve" creating two trips
- 2. check: verified, online, no active trip, 1 ≤ seats ≤ capacity
+ 2. check: not blocked, online, no active trip, 1 ≤ seats ≤ capacity
  3. SELECT … FOR UPDATE open requests on the route, oldest first
  4. drop rows that are no longer OPEN      → a competing driver took them while we waited
  5. SeatAllocator.allocate(queue, seats)   → FIFO first-fit, groups never split
@@ -100,8 +100,9 @@ request (it becomes `MATCHED`), so demand is never counted twice and auto driver
 
 ## 5. Security
 
-* **Authentication:** mobile number and BCrypt (cost 11) password through Spring Security form
-  login. OTP verification of the mobile number is required before a role can be chosen.
+* **Authentication:** email or mobile number and BCrypt (cost 11) password through Spring Security form
+  login, or Google (OIDC). Email verification is required before a role can be chosen. A Google
+  identity links only to an account whose email was already verified.
 * **OTP:** 6 digits from `SecureRandom`, stored only as a SHA-256 hash. It expires after 5 minutes,
   allows at most 5 attempts, and resends are throttled to one every 30 s.
 * **Authorisation:** URL rules (`/student/**`, `/companion/**` → STUDENT; `/driver/**` → DRIVER;

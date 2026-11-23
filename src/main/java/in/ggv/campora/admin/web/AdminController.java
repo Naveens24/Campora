@@ -53,14 +53,14 @@ public class AdminController {
     @PostMapping("/drivers/{id}/verify")
     public String verify(@PathVariable UUID id, RedirectAttributes attrs) {
         admin.verifyDriver(id);
-        Flash.success(attrs, "Driver verified.");
+        Flash.success(attrs, "Driver unblocked.");
         return "redirect:/admin#drivers";
     }
 
     @PostMapping("/drivers/{id}/revoke")
     public String revoke(@PathVariable UUID id, RedirectAttributes attrs) {
         admin.revokeDriver(id);
-        Flash.success(attrs, "Verification revoked; driver set offline.");
+        Flash.success(attrs, "Driver blocked and set offline.");
         return "redirect:/admin#drivers";
     }
 

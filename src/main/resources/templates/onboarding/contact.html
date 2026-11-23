@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Your phone number')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container">
+  <div class="auth-wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="card-c accent">
+      <div class="kicker">Almost there · Contact</div>
+      <h1 class="h3 mb-2">Add your phone number</h1>
+      <p class="text-ink-3 mb-4">Shared only with the people you're matched with, so you can find each other.</p>
+      <form th:action="@{/onboarding/contact}" method="post">
+        <label class="form-label" for="mobile">Mobile number</label>
+        <div class="input-group mb-4">
+          <span class="input-group-text mono">+91</span>
+          <input class="form-control" id="mobile" name="mobile" type="tel" inputmode="numeric"
+                 autocomplete="tel-national" placeholder="98765 43210" required autofocus>
+        </div>
+        <button type="submit" class="btn btn-route w-100 py-2">Continue <i class="bi bi-arrow-right ms-1"></i></button>
+      </form>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

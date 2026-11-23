@@ -1,6 +1,7 @@
 package in.ggv.campora.web.form;
 
 import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -14,6 +15,11 @@ public class RegisterForm {
     @NotBlank(message = "Last name is required")
     @Size(max = 60)
     private String lastName;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Enter a valid email address")
+    @Size(max = 254)
+    private String email;
 
     @NotBlank(message = "Mobile number is required")
     @Pattern(regexp = "^(\\+?91[-\\s]?|0)?[6-9]\\d{4}\\s?\\d{5}$", message = "Enter a valid 10-digit mobile number")
@@ -45,6 +51,14 @@ public class RegisterForm {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getMobile() {

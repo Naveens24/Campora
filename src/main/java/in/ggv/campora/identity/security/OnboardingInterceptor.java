@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Walks a signed-in user through onboarding in order:
- * verify mobile → choose role → complete profile. Until all three are done,
+ * verify email → add mobile → choose role → complete profile. Until all are done,
  * every page redirects to the next pending step.
  */
 @Component
@@ -24,8 +24,10 @@ public class OnboardingInterceptor implements HandlerInterceptor {
             return true;
         }
         String target;
-        if (!user.mobileVerified()) {
+        if (!user.verified()) {
             target = "/verify";
+        } else if (user.mobile() == null) {
+            target = "/onboarding/contact";
         } else if (user.role() == null) {
             target = "/onboarding/role";
         } else {

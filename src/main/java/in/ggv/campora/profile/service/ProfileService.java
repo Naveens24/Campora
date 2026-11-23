@@ -54,7 +54,7 @@ public class ProfileService {
         DriverProfile driver = requireDriver(userId);
         if (availability == Availability.ONLINE && !driver.isVerified()) {
             throw new BusinessException(
-                    "Your account is awaiting verification by the transport office.");
+                    "Your driver account is blocked. Contact the transport office.");
         }
         driver.setAvailability(availability);
         return availability;

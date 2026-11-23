@@ -1,5 +1,7 @@
 package in.ggv.campora.identity.security;
 
+import java.util.UUID;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,8 +30,8 @@ public class AuthenticationRefresher {
         this.contextRepository = contextRepository;
     }
 
-    public CamporaUserDetails signIn(String mobile, HttpServletRequest request, HttpServletResponse response) {
-        CamporaUserDetails principal = userDetailsService.loadUserByUsername(mobile);
+    public CamporaUserDetails signIn(UUID userId, HttpServletRequest request, HttpServletResponse response) {
+        CamporaUserDetails principal = userDetailsService.loadById(userId);
         var authentication = UsernamePasswordAuthenticationToken.authenticated(
                 principal, null, principal.getAuthorities());
 

@@ -8,7 +8,7 @@
   <div class="page-head">
     <div class="kicker">Transport office · Control room</div>
     <h1>Network overview</h1>
-    <p>Verify drivers, review stop suggestions and manage the stop network.</p>
+    <p>Manage drivers, review stop suggestions and manage the stop network.</p>
   </div>
 
   <!-- ── Stats ─────────────────────────────────────────────── -->
@@ -21,13 +21,7 @@
     <div class="col-6 col-md-4 col-xl"><div class="stat"><div class="v" th:text="${stats.students()}">0</div><div class="k">Students</div></div></div>
   </div>
 
-  <div class="row g-3 mb-4" th:if="${stats.driversAwaitingVerification() > 0 or stats.pendingSuggestions() > 0}">
-    <div class="col-md-6" th:if="${stats.driversAwaitingVerification() > 0}">
-      <a class="stat alert d-flex gap-3 align-items-center text-decoration-none" href="#drivers">
-        <span class="icon-badge trip"><i class="bi bi-person-badge"></i></span>
-        <span><span class="v d-block" th:text="${stats.driversAwaitingVerification()}">1</span><span class="k d-block">Drivers awaiting verification</span></span>
-      </a>
-    </div>
+  <div class="row g-3 mb-4" th:if="${stats.pendingSuggestions() > 0}">
     <div class="col-md-6" th:if="${stats.pendingSuggestions() > 0}">
       <a class="stat alert d-flex gap-3 align-items-center text-decoration-none" href="#suggestions">
         <span class="icon-badge trip"><i class="bi bi-pin-map"></i></span>
@@ -50,16 +44,16 @@
             <td th:text="${d.capacity()}">5</td>
             <td th:text="${d.nativeArea() ?: '—'}">Area</td>
             <td>
-              <span class="pill" th:if="${!d.verified()}">Unverified</span>
-              <span class="pill matched" th:if="${d.verified()}" th:text="${d.availability().name() == 'ONLINE'} ? 'Verified · online' : 'Verified'">Verified</span>
+              <span class="pill" th:if="${!d.verified()}">Blocked</span>
+              <span class="pill matched" th:if="${d.verified()}" th:text="${d.availability().name() == 'ONLINE'} ? 'Online' : 'Offline'">Offline</span>
             </td>
             <td class="text-end">
               <form th:if="${!d.verified()}" th:action="@{/admin/drivers/{id}/verify(id=${d.id()})}" method="post" class="d-inline">
-                <button type="submit" class="btn btn-sm btn-route btn-driver"><i class="bi bi-patch-check me-1"></i>Verify</button>
+                <button type="submit" class="btn btn-sm btn-route btn-driver"><i class="bi bi-patch-check me-1"></i>Unblock</button>
               </form>
               <form th:if="${d.verified()}" th:action="@{/admin/drivers/{id}/revoke(id=${d.id()})}" method="post" class="d-inline"
-                    data-confirm="Revoke this driver's verification?">
-                <button type="submit" class="btn btn-sm btn-ghost">Revoke</button>
+                    data-confirm="Block this driver from taking rides?">
+                <button type="submit" class="btn btn-sm btn-ghost">Block</button>
               </form>
             </td>
           </tr>

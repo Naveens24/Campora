@@ -11,7 +11,10 @@
       <h1 class="h3 mb-4">Sign in to Campora</h1>
 
       <div class="alert alert-danger flash" role="alert" th:if="${param.error != null}">
-        <i class="bi bi-exclamation-triangle-fill"></i><div>Wrong mobile number or password.</div>
+        <i class="bi bi-exclamation-triangle-fill"></i><div>Wrong email, mobile number or password.</div>
+      </div>
+      <div class="alert alert-danger flash" role="alert" th:if="${param.google != null}">
+        <i class="bi bi-exclamation-triangle-fill"></i><div>Google sign-in didn't complete. Please try again.</div>
       </div>
       <div class="alert alert-danger flash" role="alert" th:if="${param.suspended != null}">
         <i class="bi bi-slash-circle"></i><div>This account is suspended. Contact the transport office.</div>
@@ -22,12 +25,9 @@
 
       <form th:action="@{/login}" method="post" novalidate>
         <div class="mb-3">
-          <label class="form-label" for="mobile">Mobile number</label>
-          <div class="input-group">
-            <span class="input-group-text mono">+91</span>
-            <input class="form-control" id="mobile" name="mobile" type="tel" inputmode="numeric"
-                   autocomplete="username" placeholder="98765 43210" required autofocus>
-          </div>
+          <label class="form-label" for="mobile">Email or mobile number</label>
+          <input class="form-control" id="mobile" name="mobile" type="text"
+                 autocomplete="username" autocapitalize="none" placeholder="you@example.com" required autofocus>
         </div>
         <div class="mb-4">
           <label class="form-label" for="password">Password</label>
@@ -36,6 +36,10 @@
         </div>
         <button type="submit" class="btn btn-route w-100 py-2"><i class="bi bi-box-arrow-in-right me-1"></i>Sign in</button>
       </form>
+      <th:block th:if="${googleEnabled}">
+        <div class="or-rule"><span>or</span></div>
+        <a class="btn btn-ghost w-100 py-2" th:href="@{/oauth2/authorization/google}"><i class="bi bi-google me-2"></i>Continue with Google</a>
+      </th:block>
       <p class="text-center text-ink-3 mt-4 mb-0">New here? <a th:href="@{/register}">Create an account</a></p>
     </div>
 

@@ -14,6 +14,8 @@ public record CamporaProperties(
         @DefaultValue("Asia/Kolkata") String zone,
         @DefaultValue("false") boolean seedDemoData,
         @DefaultValue Otp otp,
+        @DefaultValue Mail mail,
+        @DefaultValue Google google,
         @DefaultValue Mobility mobility,
         @DefaultValue Companion companion) {
 
@@ -28,6 +30,23 @@ public record CamporaProperties(
             @DefaultValue("5") int maxAttempts,
             @DefaultValue("PT30S") Duration resendCooldown,
             @DefaultValue("false") boolean exposeInUi) {
+    }
+
+    /** Sender address for verification codes; blank means mail is not configured. */
+    public record Mail(@DefaultValue("") String from) {
+    }
+
+    /** Google sign-in credentials; blank hides the button. */
+    public record Google(@DefaultValue("") String clientId, @DefaultValue("") String clientSecret) {
+
+        @Override
+        public String toString() {
+            return "Google[clientId=" + clientId + "]"; // never print the secret
+        }
+
+        public boolean enabled() {
+            return !clientId.isBlank() && !clientSecret.isBlank();
+        }
     }
 
     public record Mobility(

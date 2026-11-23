@@ -19,17 +19,18 @@ import in.ggv.campora.identity.domain.RoleName;
  */
 public record CamporaUserDetails(
         UUID userId,
+        String email,
         String mobile,
         String passwordHash,
         String firstName,
         String fullName,
         RoleName role,
-        boolean mobileVerified,
+        boolean verified,
         boolean profileComplete,
         boolean suspended) implements UserDetails {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /** Authority for users who have not chosen a role yet. */
     public static final String ONBOARDING = "ROLE_ONBOARDING";
@@ -46,7 +47,7 @@ public record CamporaUserDetails(
 
     @Override
     public String getUsername() {
-        return mobile;
+        return mobile != null ? mobile : userId.toString();   // also the audit name
     }
 
     @Override
@@ -56,7 +57,7 @@ public record CamporaUserDetails(
 
     /** Fully onboarded and allowed into the role dashboards. */
     public boolean ready() {
-        return mobileVerified && role != null && profileComplete;
+        return verified && mobile != null && role != null && profileComplete;
     }
 
     public boolean isStudent() {

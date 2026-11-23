@@ -16,10 +16,17 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query("select u from User u left join fetch u.role where u.mobileNumber = :mobile")
     Optional<User> findByMobileWithRole(@Param("mobile") String mobile);
 
+    @Query("select u from User u left join fetch u.role where u.email = :email")
+    Optional<User> findByEmailWithRole(@Param("email") String email);
+
+    Optional<User> findByEmail(String email);
+
+    Optional<User> findByMobileNumber(String mobileNumber);
+
+    Optional<User> findByGoogleSubject(String googleSubject);
+
     @Query("select u from User u left join fetch u.role where u.id = :id")
     Optional<User> findByIdWithRole(@Param("id") UUID id);
-
-    boolean existsByMobileNumber(String mobileNumber);
 
     @Query("select count(u) from User u where u.role.name = :role")
     long countByRole(@Param("role") RoleName role);

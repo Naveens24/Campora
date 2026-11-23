@@ -43,8 +43,8 @@ import in.ggv.campora.profile.repository.StudentProfileRepository;
  * <pre>
  *  Admin     9000000001 / admin@123
  *  Student   9000000011 / student@123   (no request yet — try the flow)
- *  Drivers   9000000021, 9000000022 / driver@123  (verified, online)
- *            9000000023 / driver@123  (awaiting verification)
+ *  Drivers   9000000021, 9000000022 / driver@123  (online)
+ *            9000000023 / driver@123  (offline)
  * </pre>
  */
 @Component
@@ -111,7 +111,7 @@ public class DemoDataSeeder implements ApplicationRunner {
             String[] row = STUDENTS[i];
             User u = user(row[0], row[1], row[2], "student@123", RoleName.STUDENT, now);
             Department dept = departments.findByCode(row[3]).orElseThrow();
-            s[i] = students.save(new StudentProfile(u, dept, "GGV/24/" + (1001 + i), 3));
+            s[i] = students.save(new StudentProfile(u, dept, 3));
         }
 
         driver("9000000021", "Ramesh", "Kumar", VehicleType.AUTO, "CG10AB1234", 5, "Sarkanda", true, now);
@@ -138,7 +138,7 @@ public class DemoDataSeeder implements ApplicationRunner {
     }
 
     private User user(String mobile, String first, String last, String password, RoleName role, Instant now) {
-        User user = new User(first, last, mobile, encoder.encode(password));
+        User user = new User(first, last, null, mobile, encoder.encode(password));
         user.markMobileVerified(now);
         Role r = roles.findByName(role).orElseThrow();
         user.assignRole(r);
@@ -146,11 +146,10 @@ public class DemoDataSeeder implements ApplicationRunner {
     }
 
     private void driver(String mobile, String first, String last, VehicleType type, String plate, int capacity,
-                        String area, boolean verified, Instant now) {
+                        String area, boolean online, Instant now) {
         User u = user(mobile, first, last, "driver@123", RoleName.DRIVER, now);
         DriverProfile d = new DriverProfile(u, type, plate, capacity, area);
-        if (verified) {
-            d.verify();
+        if (online) {
             d.setAvailability(Availability.ONLINE);
         }
         drivers.save(d);

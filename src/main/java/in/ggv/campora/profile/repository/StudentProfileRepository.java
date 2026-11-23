@@ -22,6 +22,4 @@ public interface StudentProfileRepository extends JpaRepository<StudentProfile, 
     Optional<StudentProfile> findDetailedByUserId(@Param("userId") UUID userId);
 
     boolean existsByUserId(UUID userId);
-
-    boolean existsByEnrollmentNoIgnoreCase(String enrollmentNo);
 }

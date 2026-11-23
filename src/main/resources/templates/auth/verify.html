@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Verify mobile')}"></head>
+<head th:replace="~{fragments/layout :: head('Verify email')}"></head>
 <body>
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <main class="container">
@@ -9,7 +9,8 @@
     <div class="card-c accent">
       <div class="kicker">Step 2 of 3 · Verification</div>
       <h1 class="h3 mb-2">Enter the 6-digit code</h1>
-      <p class="text-ink-3 mb-4">Sent to <span class="mono text-body" th:text="'+91 ' + ${maskedMobile}">+91 98•••••210</span></p>
+      <p class="text-ink-3 mb-4" th:if="${email != null}">Sent to <span class="text-body" th:text="${email}">you@example.com</span>. Check spam too.</p>
+      <p class="text-ink-3 mb-4" th:if="${email == null}">Add your email below and we'll send you a code.</p>
 
       <form th:action="@{/verify}" method="post" novalidate>
         <label class="form-label visually-hidden" for="code">Verification code</label>
@@ -19,6 +20,13 @@
       </form>
       <form th:action="@{/verify/resend}" method="post" class="text-center mt-3">
         <button type="submit" class="btn btn-link text-decoration-none">Resend code</button>
+      </form>
+      <form th:action="@{/verify/email}" method="post" class="mt-3 pt-3 border-top">
+        <label class="form-label" for="email" th:text="${email == null} ? 'Your email' : 'Wrong address? Change it'">Email</label>
+        <div class="d-flex gap-2">
+          <input class="form-control" id="email" name="email" type="email" autocomplete="email" required>
+          <button type="submit" class="btn btn-ghost text-nowrap">Send code</button>
+        </div>
       </form>
     </div>
   </div>

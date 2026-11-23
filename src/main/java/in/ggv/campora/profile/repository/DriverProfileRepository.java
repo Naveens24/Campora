@@ -32,7 +32,5 @@ public interface DriverProfileRepository extends JpaRepository<DriverProfile, UU
 
     boolean existsByVehicleNumberIgnoreCase(String vehicleNumber);
 
-    long countByVerifiedFalse();
-
     long countByAvailabilityAndVerifiedTrue(Availability availability);
 }

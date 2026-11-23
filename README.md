@@ -31,9 +31,9 @@ screen.
 | Role     | Mobile       | Password      | Notes                                   |
 |----------|--------------|---------------|-----------------------------------------|
 | Student  | `9000000011` | `student@123` | No request yet. Use it to try the flow. |
-| Driver A | `9000000021` | `driver@123`  | Verified, online                        |
-| Driver B | `9000000022` | `driver@123`  | Verified, online                        |
-| Driver C | `9000000023` | `driver@123`  | Awaiting admin verification             |
+| Driver A | `9000000021` | `driver@123`  | Online                                  |
+| Driver B | `9000000022` | `driver@123`  | Online                                  |
+| Driver C | `9000000023` | `driver@123`  | Offline                                 |
 | Admin    | `9000000001` | `admin@123`   | Transport-office control room           |
 
 Students `9000000012`–`9000000018` already have open requests: 10 seats from Engineering Block to
@@ -47,7 +47,7 @@ hosting a companion ride.
 3. Back as Driver A: open the trip to see the passenger names and numbers, which appear only after acceptance.
    Then **Start** and **Complete** the trip.
 4. Sign in as **Student 9000000011**. Raise a request, watch the live-status line, and join the companion ride.
-5. Sign in as **Admin**. Verify Driver C, review stop suggestions and pause or add stops.
+5. Sign in as **Admin**. Review stop suggestions and pause or add stops.
 
 To reset the demo, stop the app, delete the `data/` folder and start it again.
 
@@ -77,8 +77,18 @@ java -jar target/campora.jar --spring.profiles.active=prod
 Flyway creates the schema on first start. On PostgreSQL it also adds partial unique indexes that
 enforce the business rules at the database level (see `docs/DATABASE.md`).
 
-To send real SMS, add a bean that implements `identity.service.SmsGateway` (MSG91, Twilio, AWS SNS…)
-in place of `LoggingSmsGateway`.
+### Email codes (Gmail SMTP)
+
+Turn on 2-Step Verification for a Google account, create an *App password*, then set
+`MAIL_USERNAME` (the address) and `MAIL_PASSWORD` (the app password, no spaces).
+For another provider also set `MAIL_HOST`, `MAIL_PORT` and `MAIL_FROM`.
+Without these, production sign-ups show "We couldn't send your code".
+
+### Google sign-in
+
+Create an OAuth client (type *Web application*) in Google Cloud with the redirect URI
+`https://<your-domain>/login/oauth2/code/google` (and `http://localhost:8080/login/oauth2/code/google`
+for local use), then set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Without them the button is hidden.
 
 ---
 
@@ -86,14 +96,14 @@ in place of `LoggingSmsGateway`.
 
 | Area | What it does |
 |---|---|
-| **Onboarding** | Register → OTP verification → choose role → complete profile. Each step is enforced by `OnboardingInterceptor`. |
+| **Onboarding** | Register (email OTP) or Google → phone number → choose role → complete profile. Each step is enforced by `OnboardingInterceptor`. |
 | **Students** | Raise a request (pickup, destination, *Auto / Companion / Any*, 1–4 seats). A live four-station status line follows it, with auto-refresh. |
 | **Demand engine** | Clusters open requests by route into hotspots. Seat reservation is FIFO first-fit and never splits a group. Row locks prevent double allocation. |
 | **Drivers** | Toggle online, see a live hotspot board (JSON polling every 15 s) and reserve seats. Start, complete or cancel trips. A cancelled trip puts its students back on the board. |
 | **Anonymity** | Drivers see only route totals. Names and mobile numbers are loaded only after a request is accepted. |
 | **Companion rides** | Any student can offer seats or join a ride. A join fulfils the student's open request on the same route. |
 | **Stop suggestions** | Students propose missing stops. The admin approves (the stop is added to the network) or rejects. |
-| **Admin** | Live stats, driver verification, stop network and departments. |
+| **Admin** | Live stats, driver blocking, stop network and departments. |
 | **History** | A unified journey history (auto, companion and hosted rides) plus request history. |
 | **Expiry** | A scheduled sweep expires stale requests so hotspots always show real, current demand. |
 
