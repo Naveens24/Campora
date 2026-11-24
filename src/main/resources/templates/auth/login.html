@@ -6,9 +6,9 @@
 <main class="container">
   <div class="auth-wrap">
     <div th:replace="~{fragments/layout :: flash}"></div>
+    <div th:replace="~{fragments/layout :: pendingRide}"></div>
     <div class="card-c accent">
-      <div class="kicker">Welcome back</div>
-      <h1 class="h4 mb-3">Sign in to Campora</h1>
+      <h1 class="h4 mb-3" th:text="${session.rideIntent != null} ? 'Sign in to continue' : 'Sign in to Campora'">Sign in</h1>
 
       <div class="alert alert-danger flash" role="alert" th:if="${param.error != null}">
         <i class="bi bi-exclamation-triangle-fill"></i><div>Wrong email, mobile number or password.</div>
@@ -46,7 +46,8 @@
         <div class="or-rule"><span>or</span></div>
         <a class="btn btn-ghost w-100 py-2" th:href="@{/oauth2/authorization/google}"><i class="bi bi-google me-2"></i>Continue with Google</a>
       </th:block>
-      <p class="text-center text-ink-3 mt-4 mb-0">New here? <a th:href="@{/register}">Create an account</a></p>
+      <div class="or-rule"><span>New here?</span></div>
+      <a class="btn btn-ghost w-100 py-2" th:href="@{/register}">Create an account</a>
     </div>
 
     <div class="card-c mt-3" th:if="${demoAccounts}">

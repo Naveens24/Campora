@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * Security model
  * <ul>
  *   <li>Form login (email or mobile + BCrypt password) with emailed OTP, or Google sign-in.</li>
+ *   <li>Home and /rides (search) are public; booking anything needs an account.</li>
  *   <li>Role-based URL rules: /student & /companion → STUDENT, /driver → DRIVER, /admin → ADMIN.</li>
  *   <li>CSRF on for every form; strict CSP, no framing, no referrer leaks off-site.</li>
  * </ul>
@@ -58,7 +59,7 @@ public class SecurityConfig {
             throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/", "/login", "/register", "/forgot", "/reset", "/error", "/error/**",
+                .requestMatchers("/", "/rides", "/rides/**", "/login", "/register", "/forgot", "/reset", "/error", "/error/**",
                         "/css/**", "/js/**", "/img/**", "/webjars/**", "/favicon.svg",
                         "/actuator/health", "/actuator/info").permitAll()
                 .requestMatchers("/student/**", "/companion/**", "/api/v1/student/**").hasRole("STUDENT")

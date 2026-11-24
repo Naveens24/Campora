@@ -7,6 +7,8 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | Method | Path | Purpose |
 |---|---|---|
 | GET | `/` | Landing page |
+| GET | `/rides` (`from`, `to`) | Search rides. No names, numbers or notes |
+| GET | `/rides/{id}` · `/rides/request` (`from`, `to`) · `/rides/offer` (`from`, `to`) | Continue to join, request or offer. Signs in first if needed, then opens the student page; books nothing by itself |
 | GET/POST | `/login` | Sign in (`mobile`, `password`) |
 | GET/POST | `/register` | Create account → signs in → `/verify` |
 | POST | `/logout` | Sign out |

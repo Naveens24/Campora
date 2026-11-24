@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import in.ggv.campora.campus.service.CampusService;
@@ -53,14 +54,19 @@ public class StudentController {
     }
 
     @GetMapping
-    public String dashboard(@AuthenticationPrincipal CamporaUserDetails me, Model model) {
+    public String dashboard(@AuthenticationPrincipal CamporaUserDetails me,
+                            @RequestParam(name = "from", required = false) UUID from,
+                            @RequestParam(name = "to", required = false) UUID to, Model model) {
         StudentRequestView active = requests.activeRequest(me.userId()).orElse(null);
         model.addAttribute("active", active);
         model.addAttribute("joinedRide", companions.joinedRide(me.userId()).orElse(null));
         model.addAttribute("hostedRide", companions.hostedRide(me.userId()).orElse(null));
         model.addAttribute("rides", companions.joinableRides(me.userId()).stream().limit(4).toList());
         if (!model.containsAttribute("form")) {
-            model.addAttribute("form", new TravelRequestForm());
+            TravelRequestForm form = new TravelRequestForm();
+            form.setPickupId(from);
+            form.setDestinationId(to);
+            model.addAttribute("form", form);
         }
         model.addAttribute("locations", campus.activeLocations());
         model.addAttribute("requestTypes", RequestType.values());

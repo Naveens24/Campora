@@ -81,6 +81,15 @@
     });
   });
 
+  // Pickup and drop must differ: data-differs="id of the other select"
+  document.querySelectorAll('select[data-differs]').forEach((drop) => {
+    const pickup = document.getElementById(drop.dataset.differs);
+    const check = () => drop.setCustomValidity(drop.value && drop.value === pickup.value ? 'Choose a different drop.' : '');
+    drop.form.addEventListener('change', check);
+    drop.form.addEventListener('click', () => setTimeout(check)); // after a swap
+    check();
+  });
+
   // ── helpers ───────────────────────────────────────────────────
   function el(tag, className, text) {
     const node = document.createElement(tag);

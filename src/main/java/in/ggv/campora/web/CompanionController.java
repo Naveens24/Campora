@@ -1,5 +1,8 @@
 package in.ggv.campora.web;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -17,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import in.ggv.campora.campus.service.CampusService;
 import in.ggv.campora.common.config.CamporaProperties;
 import in.ggv.campora.common.web.Flash;
+import in.ggv.campora.companion.dto.RideView;
 import in.ggv.campora.companion.service.CompanionService;
 import in.ggv.campora.identity.security.CamporaUserDetails;
 import in.ggv.campora.web.form.OfferRideForm;
@@ -40,12 +44,26 @@ public class CompanionController {
     }
 
     @GetMapping
-    public String page(@AuthenticationPrincipal CamporaUserDetails me, Model model) {
+    public String page(@AuthenticationPrincipal CamporaUserDetails me,
+                       @RequestParam(name = "ride", required = false) UUID picked,
+                       @RequestParam(name = "from", required = false) UUID from,
+                       @RequestParam(name = "to", required = false) UUID to, Model model) {
         model.addAttribute("hostedRide", companions.hostedRide(me.userId()).orElse(null));
         model.addAttribute("joinedRide", companions.joinedRide(me.userId()).orElse(null));
-        model.addAttribute("rides", companions.joinableRides(me.userId()));
+        List<RideView> rides = new ArrayList<>(companions.joinableRides(me.userId()));
+        if (picked != null) {
+            rides.sort(Comparator.comparing(r -> !r.id().equals(picked)));   // stable: the rest keep their order
+            model.addAttribute("picked", picked);
+            if (rides.stream().noneMatch(r -> r.id().equals(picked))) {
+                model.addAttribute("gone", true);
+            }
+        }
+        model.addAttribute("rides", rides);
         if (!model.containsAttribute("form")) {
-            model.addAttribute("form", new OfferRideForm());
+            OfferRideForm form = new OfferRideForm();
+            form.setPickupId(from);
+            form.setDestinationId(to);
+            model.addAttribute("form", form);
         }
         model.addAttribute("locations", campus.activeLocations());
         model.addAttribute("maxSeats", properties.companion().maxSeats());

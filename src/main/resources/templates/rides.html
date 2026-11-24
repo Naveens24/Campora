@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Find a ride')}"></head>
+<body class="role-companion app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container app-main">
+  <div th:replace="~{fragments/layout :: flash}"></div>
+
+  <div class="row g-3 g-lg-4">
+    <!-- ── Route ────────────────────────────────────────── -->
+    <div class="col-lg-5">
+      <h1 class="app-title" th:text="${searched} ? 'Your route' : 'Where to?'">Where to?</h1>
+      <section class="card-c">
+        <form th:action="@{/rides}" th:object="${route}" method="get">
+          <div class="od">
+            <div class="od-row">
+              <i class="pin"></i>
+              <label for="from">From</label>
+              <select class="form-select" th:field="*{from}" required>
+                <option value="">Choose pickup</option>
+                <th:block th:replace="~{fragments/layout :: stopOptions(${locations})}"></th:block>
+              </select>
+            </div>
+            <div class="od-row">
+              <i class="pin end"></i>
+              <label for="to">To</label>
+              <select class="form-select" th:field="*{to}" data-differs="from" required>
+                <option value="">Choose drop</option>
+                <th:block th:replace="~{fragments/layout :: stopOptions(${locations})}"></th:block>
+              </select>
+            </div>
+            <button type="button" class="od-swap" data-swap="from,to" aria-label="Swap pickup and drop"><i class="bi bi-arrow-down-up"></i></button>
+          </div>
+          <button type="submit" class="btn btn-lg btn-sun w-100" th:text="${searched} ? 'Search again' : 'Find a ride'">Find a ride</button>
+        </form>
+      </section>
+    </div>
+
+    <!-- ── What's on it ─────────────────────────────────── -->
+    <div class="col-lg-7">
+      <th:block th:if="${searched}">
+        <div class="block-head app-title-row"><h2>Rides on this route</h2></div>
+
+        <section class="card-c mb-3" th:if="${#lists.isEmpty(matches)}">
+          <div class="way">
+            <span class="icon-badge companion"><i class="bi bi-scooter"></i></span>
+            <div><b>No companion ride posted yet</b><span>Driving this way? Share your empty seat.</span></div>
+            <a class="btn btn-ghost" rel="nofollow" th:href="@{/rides/offer(from=${route.from},to=${route.to})}">Offer a ride</a>
+          </div>
+        </section>
+        <th:block th:each="r : ${matches}"><article th:replace="~{:: ride(${r})}"></article></th:block>
+
+        <section class="card-c way-card">
+          <div class="way">
+            <span class="icon-badge driver"><i class="bi bi-truck-front"></i></span>
+            <div>
+              <b>Shared auto</b>
+              <span th:if="${waiting > 0}" th:text="${waiting} + (${waiting} == 1 ? ' student is' : ' students are') + ' waiting on this route now'">waiting</span>
+              <span th:if="${waiting == 0}">Post your request and drivers will see it.</span>
+            </div>
+            <a class="btn btn-route" rel="nofollow" th:href="@{/rides/request(from=${route.from},to=${route.to})}">Request ride</a>
+          </div>
+        </section>
+        <p class="hint mt-2" th:if="${me == null}"><i class="bi bi-lock me-1"></i>You sign in only when you join, request or offer a ride.</p>
+      </th:block>
+
+      <div class="block-head app-title-row" th:classappend="${searched} ? 'mt-4'" th:if="${!searched or !#lists.isEmpty(others)}">
+        <h2 th:text="${searched} ? 'Other rides leaving soon' : 'Rides leaving soon'">Rides</h2>
+      </div>
+      <section class="card-c empty" th:if="${!searched and #lists.isEmpty(others)}"><i class="bi bi-people"></i>
+        <div class="fw-semibold text-body">No rides posted right now</div>
+        <div class="small mb-3">Choose your stops to request one, or share your own seats.</div>
+        <a class="btn btn-ghost" rel="nofollow" th:href="@{/rides/offer}">Offer a ride</a></section>
+      <th:block th:each="r : ${others}"><article th:replace="~{:: ride(${r})}"></article></th:block>
+    </div>
+  </div>
+
+  <th:block th:if="false">
+    <article class="ride-card" th:fragment="ride(r)">
+      <div class="hs-top">
+        <div th:replace="~{fragments/layout :: routeStack(${r.pickup()}, ${r.destination()})}"></div>
+        <div class="hs-count"><b th:text="${r.availableSeats()}">2</b><span th:text="${r.availableSeats()} == 1 ? 'seat left' : 'seats left'">seats left</span></div>
+      </div>
+      <div class="ride-foot">
+        <span><i class="bi bi-clock"></i><span th:text="${@fmt.when(r.departureTime())}">time</span></span>
+        <a class="btn btn-route" rel="nofollow" th:href="@{/rides/{id}(id=${r.id()})}">Join ride</a>
+      </div>
+    </article>
+  </th:block>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

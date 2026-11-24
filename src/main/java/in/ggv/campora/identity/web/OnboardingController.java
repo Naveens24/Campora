@@ -19,6 +19,7 @@ import in.ggv.campora.identity.security.CamporaUserDetails;
 import in.ggv.campora.identity.service.AccountService;
 import in.ggv.campora.identity.service.OnboardingService;
 import in.ggv.campora.profile.domain.VehicleType;
+import in.ggv.campora.web.RideIntent;
 import in.ggv.campora.web.form.DriverProfileForm;
 import in.ggv.campora.web.form.StudentProfileForm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -101,8 +102,8 @@ public class OnboardingController {
         }
         onboarding.createStudentProfile(me.userId(), form.getDepartmentId(), form.getSemester());
         refresher.signIn(me.userId(), request, response);
-        Flash.success(attrs, "Welcome aboard, " + me.firstName() + "! Where are you heading?");
-        return "redirect:/student";
+        Flash.success(attrs, "Welcome aboard, " + me.firstName() + "!");
+        return "redirect:" + RideIntent.studentHome(request.getSession());
     }
 
     @PostMapping("/profile/driver")

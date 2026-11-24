@@ -21,6 +21,7 @@ import in.ggv.campora.companion.domain.CompanionRide;
 import in.ggv.campora.companion.domain.CompanionRideMember;
 import in.ggv.campora.companion.domain.MemberStatus;
 import in.ggv.campora.companion.domain.RideStatus;
+import in.ggv.campora.companion.dto.PublicRide;
 import in.ggv.campora.companion.dto.RideView;
 import in.ggv.campora.companion.repository.CompanionRideMemberRepository;
 import in.ggv.campora.companion.repository.CompanionRideRepository;
@@ -215,6 +216,13 @@ public class CompanionService {
                 })
                 .sorted((a, b) -> Boolean.compare(b.matchesMyRoute(), a.matchesMyRoute()))
                 .toList();
+    }
+
+    /** Rides anyone may see, signed in or not. */
+    @Transactional(readOnly = true)
+    public List<PublicRide> upcomingRides() {
+        Instant after = clock.instant().minus(properties.companion().joinGrace());
+        return rides.findUpcoming(RideStatus.OPEN, after).stream().map(PublicRide::of).toList();
     }
 
     @Transactional(readOnly = true)

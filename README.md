@@ -154,6 +154,7 @@ mvn test
 * `MatchingServiceIntegrationTest`: the full demand engine on H2, covering the design-doc scenario,
   hotspot closing, cancellation re-queue, companion-only filtering, one trip per driver, and two
   drivers racing for the same requests.
+* `PublicRidesTest`: searching without an account, what stays private, and sign-in only when it is needed.
 * `AdminPanelTest`: who may use the admin panel, and every account, ride and deletion action in it.
 * `WebSecurityTest`: public pages, role protection, CSRF, the registration → OTP redirect and bad login.
 

@@ -4,7 +4,6 @@ import java.net.URI;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
  * page the user came from (Post/Redirect/Get), instead of an error screen.
  */
 @ControllerAdvice(annotations = Controller.class)
-@Order(Ordered.LOWEST_PRECEDENCE)
+@Order(-1) // before Spring's own problem-details handler (0), which would show JSON
 public class WebExceptionAdvice {
 
     private static final Logger log = LoggerFactory.getLogger(WebExceptionAdvice.class);

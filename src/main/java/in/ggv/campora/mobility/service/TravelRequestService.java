@@ -129,6 +129,12 @@ public class TravelRequestService {
                 others, match));
     }
 
+    /** How many requests are waiting on a route. Only the number is public. */
+    @Transactional(readOnly = true)
+    public long waitingOnRoute(UUID pickupId, UUID destinationId) {
+        return requests.countOnRoute(pickupId, destinationId, RequestStatus.OPEN, clock.instant());
+    }
+
     @Transactional(readOnly = true)
     public List<RequestHistoryRow> history(UUID userId, int limit) {
         StudentProfile student = profiles.requireStudent(userId);

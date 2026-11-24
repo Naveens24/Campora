@@ -179,6 +179,13 @@ code { color: var(--companion-ink); font-size: .85em; }
   --bs-btn-hover-bg: #fff; --bs-btn-hover-border-color: var(--ink); --bs-btn-hover-color: var(--ink);
   --bs-btn-active-bg: #fff; --bs-btn-active-border-color: var(--ink); --bs-btn-active-color: var(--ink);
 }
+.btn-sun {
+  --bs-btn-bg: var(--sun); --bs-btn-border-color: var(--sun); --bs-btn-color: var(--ink);
+  --bs-btn-hover-bg: #FFBC14; --bs-btn-hover-border-color: #FFBC14; --bs-btn-hover-color: var(--ink);
+  --bs-btn-active-bg: #F5B000; --bs-btn-active-border-color: #F5B000; --bs-btn-active-color: var(--ink);
+  --bs-btn-disabled-bg: var(--sun); --bs-btn-disabled-border-color: var(--sun); --bs-btn-disabled-color: var(--ink);
+  font-weight: 600; box-shadow: 0 12px 26px -16px rgba(214, 150, 0, .9);
+}
 .btn-light {
   --bs-btn-bg: #fff; --bs-btn-border-color: #fff; --bs-btn-color: var(--ink);
   --bs-btn-hover-bg: var(--sun); --bs-btn-hover-border-color: var(--sun); --bs-btn-hover-color: var(--ink);
@@ -443,6 +450,18 @@ code { color: var(--companion-ink); font-size: .85em; }
 .hs-form { display: flex; gap: .7rem; margin: auto 0 0; padding-top: 1rem; }
 .hs-form .btn { flex: 1; min-height: 44px; }
 
+.ride-foot { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-top: 1rem; color: var(--ink-2); font-size: .88rem; font-weight: 500; }
+.ride-foot > span { display: inline-flex; align-items: center; gap: .45rem; }
+.ride-card.picked { border-color: var(--route); box-shadow: 0 0 0 3px var(--route-tint); }
+.ride-card + .way-card { margin-top: .8rem; }
+.way { display: flex; flex-wrap: wrap; align-items: center; gap: .7rem .9rem; }
+.way > div { flex: 1 1 160px; min-width: 0; line-height: 1.4; }
+.way b { display: block; color: var(--ink); font-weight: 600; }
+.way > div > span { color: var(--ink-3); font-size: .84rem; }
+.pending { margin-bottom: .9rem; padding: .9rem 1.1rem; border: 1px solid #C5E6D5; border-radius: var(--radius); background: var(--companion-tint); --route: var(--companion); }
+.pending .label { color: var(--companion-ink); }
+.pending .rs { margin-top: .5rem; }
+
 /* seat stepper */
 .stepper { display: inline-flex; align-items: center; flex: 0 0 auto; border: 1px solid var(--line-2); border-radius: 999px; background: #fff; }
 .stepper button { width: 42px; height: 42px; border: 0; border-radius: 50%; background: none; color: var(--ink); font: 500 1.15rem/1 var(--font); }
@@ -664,11 +683,32 @@ code { color: var(--companion-ink); font-size: .85em; }
 }
 .hero h1 { font-size: clamp(1.8rem, 3.6vw, 2.9rem); font-weight: 700; letter-spacing: -.04em; line-height: 1.12; margin: .8rem 0 .7rem; }
 .hero .lead { font-size: clamp(.92rem, 1.2vw, 1rem); line-height: 1.6; color: var(--ink-2); max-width: 28rem; margin-bottom: 1.1rem; }
-.hero-proof { display: flex; flex-wrap: wrap; gap: .3rem 1rem; margin-top: 1rem; color: var(--ink-3); font-size: .78rem; }
-.hero-proof span { display: inline-flex; align-items: center; gap: .45rem; }
-.hero-proof i { color: var(--companion); }
+a.eyebrow-pill { text-decoration: none; transition: border-color .2s; }
+a.eyebrow-pill:hover { border-color: var(--companion); }
+.hero-art { display: block; width: 100%; height: auto; }
 
-/* hero device */
+/* pick a route */
+.book { max-width: 33rem; }
+.book-fields { position: relative; display: grid; grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+.book-field {
+  display: flex; align-items: center; gap: .9rem; height: 64px; padding-left: 1.2rem;
+  border: 1.5px solid var(--line-2); border-radius: 14px; background: #fff; transition: border-color .2s, box-shadow .2s;
+}
+.book-field:hover { border-color: #BDB8AC; }
+.book-field:focus-within { border-color: var(--ink); box-shadow: 0 0 0 4px rgba(255, 200, 61, .4); }
+.book-field > i { flex: 0 0 auto; color: var(--ink); font-size: 1.25rem; line-height: 1; }
+.book-field select {
+  flex: 1; min-width: 0; height: 100%; padding: 0 4.6rem 0 0; border: 0; outline: 0; background: none; -webkit-appearance: none; appearance: none;
+  color: var(--ink); font: 500 1rem var(--font); text-overflow: ellipsis; cursor: pointer;
+}
+.book-field select:invalid { color: var(--ink-3); font-weight: 400; }
+.book-field option, .book-field optgroup { color: var(--ink); font-weight: 400; }
+.book-fields .od-swap { right: 1rem; width: 44px; height: 44px; }
+.book-go { width: 100%; height: 62px; margin-top: 1rem; border-radius: 14px; font-size: 1.1rem; }
+.book-note { margin: .8rem 0 0; color: var(--ink-3); font-size: .84rem; }
+.book-note a { color: var(--companion-ink); font-weight: 600; white-space: nowrap; }
+
+/* the app on a phone (How it works) */
 .device-stage { position: relative; display: grid; place-items: center; min-height: 430px; }
 .device-stage::before {
   content: ""; position: absolute; width: 350px; height: 350px; max-width: 92%; aspect-ratio: 1; border-radius: 50%;
@@ -691,7 +731,6 @@ code { color: var(--companion-ink); font-size: .85em; }
   background: var(--ink); transform: translateX(-50%);
 }
 .device-map { position: relative; height: 215px; }
-.device-map .map-wide { display: none; }
 .device-map svg { display: block; width: 100%; height: 100%; }
 .map-route { stroke-dasharray: 520; stroke-dashoffset: 520; animation: draw 2.2s .4s var(--ease) forwards; }
 @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -850,23 +889,14 @@ code { color: var(--companion-ink); font-size: .85em; }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* ── responsive ──────────────────────────────────────────────── */
+@media (max-width: 1199.98px) { .fc-seats { display: none; } }
+@media (min-width: 992px) { .landing-page .steps-grid { grid-template-columns: 1fr; } }
 @media (max-width: 991.98px) {
-  .device-stage { min-height: 0; }
-  .device-stage::before, .device-stage::after, .fc-seats { display: none; }
+  .book { max-width: none; }
+  .hero-art { max-width: 560px; margin-inline: auto; }
   .safety-grid { grid-template-columns: repeat(2, 1fr); }
 }
-/* Phones and small tablets: the mock-up becomes a compact ride card */
 @media (max-width: 767.98px) {
-  .device { width: 100%; max-width: 420px; padding: 0; border-radius: 18px; background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow); animation: none; }
-  .device-screen { border-radius: 17px; }
-  .device-notch, .sheet-grip, .fc-confirm, .device .ride-row:not(.hl) { display: none; }
-  .device-map { height: 120px; }
-  .device-map svg:not(.map-wide) { display: none; }
-  .device-map .map-wide { display: block; }
-  .device-sheet { margin-top: -14px; padding: .75rem .8rem .8rem; border-radius: 16px 16px 0 0; }
-  .sheet-title { margin-bottom: .5rem; }
-  .map-chip.from { top: 10px; }
-  .map-chip.to { bottom: auto; top: 10px; }
   .steps-grid { grid-template-columns: 1fr; gap: 0; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 0 .9rem; }
   .step-card { border: 0; border-radius: 0; padding: .7rem 0; background: none; }
   .step-card + .step-card { border-top: 1px solid var(--line); }
@@ -884,6 +914,9 @@ code { color: var(--companion-ink); font-size: .85em; }
   .stations .st { font-size: .68rem; }
   .safety-grid { gap: .5rem; }
   .safety-card { padding: .6rem; gap: .55rem; }
+  .book-field { height: 58px; }
+  .book-go { height: 58px; }
+  .way .btn { flex: 1 1 100%; }
   .driver-band { grid-template-columns: auto 1fr; }
   .driver-band .btn { grid-column: 1 / -1; }
   .footer-rich .container { flex-direction: column; align-items: flex-start; }

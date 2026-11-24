@@ -80,10 +80,11 @@
   </div>
 
   <div id="panel-find" role="tabpanel" aria-labelledby="tab-find">
+    <div class="alert alert-info flash" role="status" th:if="${gone}"><i class="bi bi-info-circle-fill"></i><div>The ride you picked has left or filled up.</div></div>
     <section class="card-c empty" th:if="${#lists.isEmpty(rides)}"><i class="bi bi-people"></i>
       <div class="fw-semibold text-body">No rides right now</div>
       <div class="small">Going somewhere? Tap Offer to share your seats.</div></section>
-    <article class="ride-card" th:each="r : ${rides}">
+    <article class="ride-card" th:each="r : ${rides}" th:classappend="${picked == r.id()} ? 'picked'">
       <div class="hs-top">
         <div th:replace="~{fragments/layout :: routeStack(${r.pickup()}, ${r.destination()})}"></div>
         <div class="hs-count"><b th:text="${r.availableSeats()}">2</b><span th:text="${r.availableSeats() == 1} ? 'seat' : 'seats'">seats</span></div>
@@ -92,6 +93,7 @@
         <span><i class="bi bi-clock"></i><span th:text="${@fmt.when(r.departureTime())}">time</span></span>
         <span><i class="bi bi-person"></i><span th:text="${r.hostName()}">Host</span></span>
         <span class="hs-full" th:if="${r.matchesMyRoute()}">Your route</span>
+        <span class="hs-full" th:if="${picked == r.id()}">Your pick</span>
       </div>
       <p class="hint mb-0 mt-2" th:if="${r.note() != null and !#strings.isEmpty(r.note())}" th:text="${r.note()}">note</p>
       <form class="hs-form" th:action="@{/companion/rides/{id}/join(id=${r.id()})}" method="post">

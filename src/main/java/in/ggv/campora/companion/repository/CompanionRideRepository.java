@@ -35,6 +35,17 @@ public interface CompanionRideRepository extends JpaRepository<CompanionRide, UU
                                      @Param("after") Instant after,
                                      @Param("excludeHostId") UUID excludeHostId);
 
+    /** Every joinable ride, soonest first, without its host: for the public pages. */
+    @Query("""
+            select r from CompanionRide r
+              join fetch r.pickup
+              join fetch r.destination
+             where r.status = :status
+               and r.departureTime > :after
+             order by r.departureTime asc
+            """)
+    List<CompanionRide> findUpcoming(@Param("status") RideStatus status, @Param("after") Instant after);
+
     @Query("""
             select r from CompanionRide r
               join fetch r.pickup
