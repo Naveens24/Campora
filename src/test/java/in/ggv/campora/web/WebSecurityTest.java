@@ -41,7 +41,7 @@ class WebSecurityTest {
 
     @Test
     void formsRequireCsrfToken() throws Exception {
-        mvc.perform(post("/register").param("mobile", "9876543210")).andExpect(status().isForbidden());
+        mvc.perform(post("/register").param("mobile", "9876543210")).andExpect(redirectedUrl("/register?expired"));
     }
 
     @Test
@@ -51,8 +51,8 @@ class WebSecurityTest {
                         .param("lastName", "Student")
                         .param("email", "test.student@example.com")
                         .param("mobile", "9123456780")
-                        .param("password", "password123")
-                        .param("confirmPassword", "password123"))
+                        .param("password", "river-stone-42")
+                        .param("confirmPassword", "river-stone-42"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/verify"));
     }

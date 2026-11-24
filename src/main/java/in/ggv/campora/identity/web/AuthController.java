@@ -17,6 +17,7 @@ import in.ggv.campora.common.exception.BusinessException;
 import in.ggv.campora.common.web.Flash;
 import in.ggv.campora.identity.security.AuthenticationRefresher;
 import in.ggv.campora.identity.security.CamporaUserDetails;
+import in.ggv.campora.identity.security.CodeThrottle;
 import in.ggv.campora.identity.service.AccountService;
 import in.ggv.campora.identity.service.OtpService;
 import in.ggv.campora.web.form.RegisterForm;
@@ -30,15 +31,18 @@ public class AuthController {
 
     private final AccountService accounts;
     private final AuthenticationRefresher refresher;
+    private final CodeThrottle codes;
     private final boolean mailEnabled;
     /** Test mode only: never while real emails go out. */
     private final boolean exposeOtp;
     private final boolean demoAccounts;
     private final boolean googleEnabled;
 
-    public AuthController(AccountService accounts, AuthenticationRefresher refresher, CamporaProperties properties) {
+    public AuthController(AccountService accounts, AuthenticationRefresher refresher, CodeThrottle codes,
+                          CamporaProperties properties) {
         this.accounts = accounts;
         this.refresher = refresher;
+        this.codes = codes;
         this.mailEnabled = !properties.mail().from().isBlank();
         this.exposeOtp = properties.otp().exposeInUi() && !mailEnabled;
         this.demoAccounts = properties.seedDemoData();
@@ -76,6 +80,7 @@ public class AuthController {
         }
         UUID userId;
         try {
+            codes.check(request);
             userId = accounts.register(form.getFirstName(), form.getLastName(), form.getEmail(), form.getMobile(),
                     form.getPassword());
         } catch (BusinessException e) {
@@ -114,6 +119,7 @@ public class AuthController {
     @PostMapping("/verify/email")
     public String changeEmail(@AuthenticationPrincipal CamporaUserDetails me, @RequestParam("email") String email,
                               HttpServletRequest request, HttpServletResponse response, RedirectAttributes attrs) {
+        codes.check(request);
         accounts.changePendingEmail(me.userId(), email);
         CamporaUserDetails updated = refresher.signIn(me.userId(), request, response);
         try {
@@ -125,7 +131,9 @@ public class AuthController {
     }
 
     @PostMapping("/verify/resend")
-    public String resend(@AuthenticationPrincipal CamporaUserDetails me, RedirectAttributes attrs) {
+    public String resend(@AuthenticationPrincipal CamporaUserDetails me, HttpServletRequest request,
+                         RedirectAttributes attrs) {
+        codes.check(request);
         sendCode(me, attrs);
         return "redirect:/verify";
     }

@@ -113,7 +113,12 @@ request (it becomes `MATCHED`), so demand is never counted twice and auto driver
   students and drivers; only owners manage admins. `AdminGuard` re-reads the acting admin on every change,
   so a removed admin's open session is useless. Temporary passwords must be replaced at the next sign-in.
   Every change is written to `admin_action`.
-* **Sign-in throttle:** ten wrong passwords for one account from one address pause sign-in for 15 minutes.
+* **Sign-in throttle:** ten wrong passwords for one account from one address, or a hundred from one
+  network, pause sign-in for 15 minutes. Code emails are limited to 60 an hour and 200 a day per network.
+  Limits are skipped when only a proxy or private address is known.
+* **Sessions:** looking around opens none. Visitors' sessions end after 30 idle minutes, signed-in ones
+  after 12 hours. A form older than its session is sent back with an explanation.
+* **Unknown addresses** are "not found", never a sign-in page. `/api/**` answers 401 and the page reloads.
 * **Onboarding gate:** `OnboardingInterceptor` redirects until verify → role → profile are all done.
   `AuthenticationRefresher` re-issues the session (with a new session ID) after each step.
 * **Web hardening:** CSRF on all forms, strict Content-Security-Policy (scripts only from `'self'`,

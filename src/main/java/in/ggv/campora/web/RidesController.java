@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import in.ggv.campora.campus.dto.LocationOption;
@@ -44,7 +45,14 @@ public class RidesController {
     }
 
     @GetMapping
-    public String search(@ModelAttribute("route") RouteForm route, BindingResult ignored, Model model) {
+    public String search(@ModelAttribute("route") RouteForm route, BindingResult ignored, Model model,
+                         @RequestParam(name = "mode", required = false) String mode, RedirectAttributes attrs) {
+        if ("offer".equals(mode)) { // the homepage's "Offer a ride" switch
+            if (route.complete()) {
+                attrs.addAttribute("from", route.getFrom()).addAttribute("to", route.getTo());
+            }
+            return "redirect:/rides/offer";
+        }
         List<PublicRide> rides = companions.upcomingRides();
         String problem = problemWith(route);
         boolean searched = problem == null && route.complete();

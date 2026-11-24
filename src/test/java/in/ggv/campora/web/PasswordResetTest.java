@@ -52,7 +52,7 @@ class PasswordResetTest {
 
     @Test
     void unknownAndUnverifiedEmailsLookTheSameAndGetNoCode() throws Exception {
-        accounts.register("Pen", "Ding", "pending@example.com", "9123400101", "password123");
+        accounts.register("Pen", "Ding", "pending@example.com", "9123400101", "river-stone-42");
         for (String email : new String[] {"nobody@example.com", "pending@example.com"}) {
             MvcResult sent = request(email);
             assertThat(sent.getFlashMap().get("devOtp")).isNull();

@@ -26,7 +26,7 @@ public class RegisterForm {
     private String mobile;
 
     @NotBlank(message = "Choose a password")
-    @Size(min = 8, max = 64, message = "Use 8 to 64 characters")
+    @GoodPassword
     private String password;
 
     @NotBlank(message = "Repeat your password")

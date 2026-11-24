@@ -55,13 +55,10 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
       mail.smtp.starttls.required: true
+      mail.smtp.ssl.checkserveridentity: true
       mail.smtp.connectiontimeout: 5000
       mail.smtp.timeout: 10000
       mail.smtp.writetimeout: 10000
-
-  mvc:
-    problemdetails:
-      enabled: true
 
 server:
   port: 8080
@@ -71,7 +68,7 @@ server:
     min-response-size: 1024
   servlet:
     session:
-      timeout: 8h
+      timeout: 30m             # visitors; ActiveSessions gives signed-in people longer
       cookie:
         http-only: true
         same-site: lax
@@ -87,7 +84,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health
   endpoint:
     health:
       show-details: never

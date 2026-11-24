@@ -19,6 +19,7 @@ import in.ggv.campora.common.web.Flash;
 import in.ggv.campora.identity.security.ActiveSessions;
 import in.ggv.campora.identity.security.AuthenticationRefresher;
 import in.ggv.campora.identity.security.CamporaUserDetails;
+import in.ggv.campora.identity.security.CodeThrottle;
 import in.ggv.campora.identity.service.AccountService;
 import in.ggv.campora.identity.service.OtpService;
 import in.ggv.campora.web.form.NewPasswordForm;
@@ -37,13 +38,15 @@ public class PasswordController {
     private final AccountService accounts;
     private final ActiveSessions sessions;
     private final AuthenticationRefresher refresher;
+    private final CodeThrottle codes;
     private final boolean exposeOtp;
 
     public PasswordController(AccountService accounts, ActiveSessions sessions, AuthenticationRefresher refresher,
-                              CamporaProperties properties) {
+                              CodeThrottle codes, CamporaProperties properties) {
         this.accounts = accounts;
         this.sessions = sessions;
         this.refresher = refresher;
+        this.codes = codes;
         this.exposeOtp = properties.otp().exposeInUi() && properties.mail().from().isBlank();
     }
 
@@ -54,12 +57,13 @@ public class PasswordController {
 
     @PostMapping("/forgot")
     public String sendCode(@AuthenticationPrincipal CamporaUserDetails me, @RequestParam("email") String email,
-                           HttpSession session, RedirectAttributes attrs) {
+                           HttpServletRequest request, HttpSession session, RedirectAttributes attrs) {
         if (me != null) {
             return "redirect:/dashboard";
         }
         Optional<OtpService.IssuedOtp> otp;
         try {
+            codes.check(request);
             otp = accounts.sendPasswordReset(email);
         } catch (BusinessException e) {
             Flash.error(attrs, e.getMessage());

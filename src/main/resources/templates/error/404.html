@@ -10,10 +10,12 @@
       <div class="kicker">404 · Wrong turn</div>
       <h1 class="h3">This stop isn't on the map</h1>
       <p class="text-ink-3">The page or record you're looking for doesn't exist, or isn't yours to see.</p>
-      <a class="btn btn-route" th:href="@{/dashboard}">Back to my dashboard</a>
+      <a class="btn btn-route" th:if="${me != null}" th:href="@{/dashboard}">Back to my dashboard</a>
+      <a class="btn btn-route" th:if="${me == null}" th:href="@{/}">Go home</a>
     </div>
   </div>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

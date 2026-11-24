@@ -90,13 +90,13 @@ class AdminPanelTest {
     void admins() throws Exception {
         ownerId = accounts.signInWithGoogle("owner-sub", "owner@example.com", "Olive", "Owner");
         users.findById(ownerId).ifPresent(u -> {
-            u.setPasswordHash(encoder.encode("password123"));
+            u.setPasswordHash(encoder.encode("river-stone-42"));
             users.save(u);
         });
-        owner = login("owner@example.com", "password123");
+        owner = login("owner@example.com", "river-stone-42");
         User plain = person(RoleName.ADMIN);
         adminId = plain.getId();
-        admin = login(plain.getMobileNumber(), "password123");
+        admin = login(plain.getMobileNumber(), "river-stone-42");
     }
 
     // ── becoming an admin ──────────────────────────────────────
@@ -128,7 +128,7 @@ class AdminPanelTest {
 
     @Test
     void studentsAndDriversCannotOpenIt() throws Exception {
-        MockHttpSession student = login(person(RoleName.STUDENT).getMobileNumber(), "password123");
+        MockHttpSession student = login(person(RoleName.STUDENT).getMobileNumber(), "river-stone-42");
         for (String path : new String[] {"/admin", "/admin/users", "/admin/rides", "/admin/users/" + ownerId}) {
             mvc.perform(get(path).session(student)).andExpect(status().isForbidden());
         }
@@ -222,7 +222,7 @@ class AdminPanelTest {
                 .session(admin)).andReturn();
         String temporary = (String) set.getFlashMap().get("temporaryPassword");
         assertThat(temporary).matches("[a-z2-9]{4}-[a-z2-9]{4}-[a-z2-9]{4}");
-        loginAttempt(u.getMobileNumber(), "password123").andExpect(redirectedUrl("/login?error"));
+        loginAttempt(u.getMobileNumber(), "river-stone-42").andExpect(redirectedUrl("/login?error"));
 
         MockHttpSession session = login(u.getMobileNumber(), temporary);
         mvc.perform(get("/student").session(session)).andExpect(redirectedUrl("/account/password"));
@@ -255,12 +255,12 @@ class AdminPanelTest {
     @Test
     void stuckUnverifiedAccountsCanBeVerified() throws Exception {
         String mobile = "7" + unique(9);
-        UUID id = accounts.register("Stuck", "User", mobile + "@example.com", mobile, "password123");
+        UUID id = accounts.register("Stuck", "User", mobile + "@example.com", mobile, "river-stone-42");
         mvc.perform(get("/admin/users?show=UNVERIFIED").session(admin))
                 .andExpect(content().string(containsString(mobile)));
         act(admin, id, "verify").andExpect(flash().attributeExists("success"));
         assertThat(users.findById(id).orElseThrow().getStatus()).isEqualTo(UserStatus.ACTIVE);
-        mvc.perform(get("/dashboard").session(login(mobile, "password123"))).andExpect(redirectedUrl("/onboarding/role"));
+        mvc.perform(get("/dashboard").session(login(mobile, "river-stone-42"))).andExpect(redirectedUrl("/onboarding/role"));
     }
 
     @Test
@@ -277,12 +277,12 @@ class AdminPanelTest {
         UUID id = studentUser();
         String mobile = users.findById(id).orElseThrow().getMobileNumber();
         role(admin, id, "DRIVER").andExpect(flash().attributeExists("success"));
-        mvc.perform(get("/dashboard").session(login(mobile, "password123")))
+        mvc.perform(get("/dashboard").session(login(mobile, "river-stone-42")))
                 .andExpect(redirectedUrl("/onboarding/profile"));
         mvc.perform(get("/admin/users?show=UNFINISHED&q=" + mobile).session(admin))
                 .andExpect(content().string(not(containsString("No one found"))));
         role(admin, id, "STUDENT").andExpect(flash().attributeExists("success"));
-        mvc.perform(get("/dashboard").session(login(mobile, "password123"))).andExpect(redirectedUrl("/student"));
+        mvc.perform(get("/dashboard").session(login(mobile, "river-stone-42"))).andExpect(redirectedUrl("/student"));
     }
 
     // ── suspend, block, delete ─────────────────────────────────
@@ -295,11 +295,11 @@ class AdminPanelTest {
         mvc.perform(post("/admin/users/" + id + "/suspend").with(csrf()).session(admin).param("reason", "Spam"))
                 .andExpect(flash().attributeExists("success"));
         assertThat(requests.findById(request).orElseThrow().getStatus()).isEqualTo(RequestStatus.CANCELLED);
-        loginAttempt(mobile, "password123").andExpect(redirectedUrl("/login?suspended"));
+        loginAttempt(mobile, "river-stone-42").andExpect(redirectedUrl("/login?suspended"));
         mvc.perform(get("/admin/users/" + id + "?tab=history").session(admin))
                 .andExpect(content().string(containsString("Spam")));
         act(admin, id, "reactivate");
-        login(mobile, "password123");
+        login(mobile, "river-stone-42");
     }
 
     @Test
@@ -348,11 +348,11 @@ class AdminPanelTest {
         assertThat(trips.findById(trip).orElseThrow().getStatus()).isEqualTo(TripStatus.COMPLETED);
         assertThat(requests.findById(request).orElseThrow().getStatus()).isEqualTo(RequestStatus.COMPLETED);
 
-        loginAttempt(before.getMobileNumber(), "password123").andExpect(redirectedUrl("/login?error"));
+        loginAttempt(before.getMobileNumber(), "river-stone-42").andExpect(redirectedUrl("/login?error"));
         mvc.perform(get("/admin/users/" + passenger).session(admin)).andExpect(status().isNotFound());
         mvc.perform(get("/admin/users").param("q", "Deleted user").session(admin))
                 .andExpect(content().string(containsString("No one found")));
-        accounts.register("Back", "Again", before.getEmail(), before.getMobileNumber(), "password123");
+        accounts.register("Back", "Again", before.getEmail(), before.getMobileNumber(), "river-stone-42");
     }
 
     @Test
@@ -459,10 +459,10 @@ class AdminPanelTest {
         for (int i = 0; i < 10; i++) {
             loginAttempt(i % 2 == 0 ? mobile : "+91 " + mobile, "wrong").andExpect(redirectedUrl("/login?error"));
         }
-        loginAttempt(mobile, "password123").andExpect(redirectedUrl("/login?locked"));
+        loginAttempt(mobile, "river-stone-42").andExpect(redirectedUrl("/login?locked"));
         mvc.perform(post(java.net.URI.create("/%6Cogin")).with(csrf()).param("mobile", mobile)
-                .param("password", "password123")).andExpect(redirectedUrl("/login?locked"));
-        login(person(null).getMobileNumber(), "password123");   // nobody else is affected
+                .param("password", "river-stone-42")).andExpect(redirectedUrl("/login?locked"));
+        login(person(null).getMobileNumber(), "river-stone-42");   // nobody else is affected
         mvc.perform(get("/login?locked")).andExpect(content().string(containsString("Wait 15 minutes")));
     }
 
@@ -504,7 +504,7 @@ class AdminPanelTest {
 
     private User person(RoleName role) {
         String mobile = "6" + unique(9);
-        User u = new User("Person" + mobile, "Test", mobile + "@example.com", mobile, encoder.encode("password123"));
+        User u = new User("Person" + mobile, "Test", mobile + "@example.com", mobile, encoder.encode("river-stone-42"));
         u.markEmailVerified(clock.instant());
         if (role != null) {
             u.assignRole(roles.findByName(role).orElseThrow());

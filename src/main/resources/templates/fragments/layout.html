@@ -14,8 +14,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Campora — companion rides and shared autos for Guru Ghasidas Vishwavidyalaya students.">
   <meta name="theme-color" content="#F7F6F2">
-  <meta name="_csrf" th:if="${_csrf != null}" th:content="${_csrf.token}">
-  <meta name="_csrf_parameter" th:if="${_csrf != null}" th:content="${_csrf.parameterName}">
+  <meta name="_csrf" th:if="${me != null and _csrf != null}" th:content="${_csrf.token}">
+  <meta name="_csrf_parameter" th:if="${me != null and _csrf != null}" th:content="${_csrf.parameterName}">
   <title th:text="${title} + ' · Campora'">Campora</title>
   <link rel="icon" type="image/svg+xml" th:href="@{/favicon.svg}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -40,7 +40,7 @@
         <button type="submit" class="icon-btn" aria-label="Sign out"><i class="bi bi-box-arrow-right"></i></button>
       </form>
     </div>
-    <a class="btn btn-sm btn-ghost ms-auto me-2 d-lg-none" th:if="${me == null}" th:href="@{/login}">Sign in</a>
+    <a class="btn btn-sm btn-ghost ms-auto me-2 d-lg-none" th:if="${me == null and currentPath != '/login'}" th:href="@{/login}">Sign in</a>
     <button th:unless="${me != null and me.ready()}" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
             aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
@@ -76,7 +76,7 @@
           <button type="submit" class="btn btn-sm btn-ghost"><i class="bi bi-box-arrow-right me-1"></i>Sign out</button>
         </form>
       </div>
-      <a class="btn btn-sm btn-ghost d-none d-lg-inline-block" th:if="${me == null}" th:href="@{/login}">Sign in</a>
+      <a class="btn btn-sm btn-ghost d-none d-lg-inline-block" th:if="${me == null and currentPath != '/login'}" th:href="@{/login}">Sign in</a>
     </div>
   </div>
 </nav>
@@ -87,6 +87,9 @@
   </div>
   <div class="alert alert-danger flash" role="alert" th:if="${error != null}">
     <i class="bi bi-exclamation-triangle-fill"></i><div th:text="${error}">Error</div>
+  </div>
+  <div class="alert alert-info flash" role="status" th:if="${param.expired != null}">
+    <i class="bi bi-clock-history"></i><div>That page was open for too long. Please try again.</div>
   </div>
   <div class="alert alert-info flash" role="note" th:if="${devOtp != null}">
     <i class="bi bi-code-slash"></i>

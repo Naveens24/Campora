@@ -66,6 +66,21 @@ class PublicRidesTest {
     }
 
     @Test
+    void theOfferSwitchKeepsTheRoute() throws Exception {
+        String from = stop("Main Gate").toString();
+        String to = stop("Nehru Chowk").toString();
+        mvc.perform(get("/rides").param("mode", "offer").param("from", from).param("to", to))
+                .andExpect(redirectedUrl("/rides/offer?from=" + from + "&to=" + to));
+        mvc.perform(get("/rides").param("mode", "find").param("from", from).param("to", to))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void suggestedRoutesLeadToResults() throws Exception {
+        mvc.perform(get("/")).andExpect(content().string(containsString("/rides?from=" + stop("Main Gate") + "&amp;to=")));
+    }
+
+    @Test
     void resultsShowRidesButNotPeople() throws Exception {
         student("9123500001", "Hostfirst");
         UUID from = stop("Main Gate");
@@ -122,7 +137,7 @@ class PublicRidesTest {
                 .andExpect(content().string(containsString("Join this ride")))
                 .andExpect(content().string(containsString("Science Block")));
         mvc.perform(post("/login").with(csrf()).session(session).param("mobile", "9123500004@example.com")
-                .param("password", "password123")).andExpect(redirectedUrl("/dashboard"));
+                .param("password", "river-stone-42")).andExpect(redirectedUrl("/dashboard"));
         mvc.perform(get("/dashboard").session(session)).andExpect(redirectedUrl("/companion?ride=" + ride));
         mvc.perform(get("/companion").param("ride", ride.toString()).session(session))
                 .andExpect(content().string(containsString("Your pick")));
@@ -211,7 +226,7 @@ class PublicRidesTest {
         MvcResult registered = mvc.perform(post("/register").with(csrf()).session(session)
                         .param("firstName", firstName).param("lastName", "Person")
                         .param("email", mobile + "@example.com").param("mobile", mobile)
-                        .param("password", "password123").param("confirmPassword", "password123"))
+                        .param("password", "river-stone-42").param("confirmPassword", "river-stone-42"))
                 .andExpect(redirectedUrl("/verify")).andReturn();
         String code = (String) registered.getFlashMap().get("devOtp");
         mvc.perform(post("/verify").with(csrf()).session(session).param("code", code))

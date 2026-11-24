@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.6</version>
+        <version>3.5.16</version>
         <relativePath/>
     </parent>
 
@@ -21,6 +21,13 @@
         <java.version>21</java.version>
         <bootstrap.version>5.3.3</bootstrap.version>
         <bootstrap-icons.version>1.11.3</bootstrap-icons.version>
+        <!-- Security fixes newer than the ones Spring Boot brings; drop each once Boot catches up. -->
+        <tomcat.version>10.1.61</tomcat.version>
+        <jackson-bom.version>2.21.8</jackson-bom.version>
+        <thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
+        <postgresql.version>42.7.14</postgresql.version>
+        <logback.version>1.5.38</logback.version>
+        <log4j2.version>2.25.5</log4j2.version>
     </properties>
 
     <dependencies>

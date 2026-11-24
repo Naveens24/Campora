@@ -86,14 +86,14 @@ class OnboardingFlowTest {
     void emailAndGoogleSignInReachTheSameAccount() throws Exception {
         signUp("9123400003", "STUDENT");
         mvc.perform(post("/login").with(csrf()).param("mobile", "9123400003@EXAMPLE.com")
-                .param("password", "password123")).andExpect(redirectedUrl("/dashboard"));
+                .param("password", "river-stone-42")).andExpect(redirectedUrl("/dashboard"));
         UUID viaGoogle = accounts.signInWithGoogle("sub-1", "9123400003@example.com", "Test", "User");
         assertThat(viaGoogle).isEqualTo(users.findByMobileNumber("9123400003").orElseThrow().getId());
     }
 
     @Test
     void googleNeverAdoptsAnUnverifiedRegistration() {
-        UUID squatter = accounts.register("Bad", "Actor", "victim@example.com", "9123400004", "password123");
+        UUID squatter = accounts.register("Bad", "Actor", "victim@example.com", "9123400004", "river-stone-42");
         UUID owner = accounts.signInWithGoogle("sub-2", "victim@example.com", "Real", null);
         assertThat(owner).isNotEqualTo(squatter);
         assertThat(users.findById(squatter)).isEmpty();
@@ -103,7 +103,7 @@ class OnboardingFlowTest {
     @Test
     void verifiedEmailCannotBeRegisteredAgain() {
         accounts.signInWithGoogle("sub-3", "taken@example.com", "A", "B");
-        assertThatThrownBy(() -> accounts.register("X", "Y", "taken@example.com", "9123400005", "password123"))
+        assertThatThrownBy(() -> accounts.register("X", "Y", "taken@example.com", "9123400005", "river-stone-42"))
                 .isInstanceOf(BusinessException.class);
     }
 
@@ -131,9 +131,9 @@ class OnboardingFlowTest {
 
     @Test
     void mistypedEmailCanBeCorrected() throws Exception {
-        UUID id = accounts.register("Typo", "User", "typo@example.con", "9123400007", "password123");
+        UUID id = accounts.register("Typo", "User", "typo@example.con", "9123400007", "river-stone-42");
         MvcResult login = mvc.perform(post("/login").with(csrf()).param("mobile", "9123400007")
-                .param("password", "password123")).andReturn();
+                .param("password", "river-stone-42")).andReturn();
         MockHttpSession session = (MockHttpSession) login.getRequest().getSession(false);
         mvc.perform(get("/verify").session(session)).andExpect(status().isOk());
         mvc.perform(post("/verify/email").with(csrf()).session(session).param("email", "typo@example.com"))
@@ -153,7 +153,7 @@ class OnboardingFlowTest {
         MvcResult registered = mvc.perform(post("/register").with(csrf())
                         .param("firstName", "Test").param("lastName", "User").param("mobile", mobile)
                         .param("email", mobile + "@example.com")
-                        .param("password", "password123").param("confirmPassword", "password123"))
+                        .param("password", "river-stone-42").param("confirmPassword", "river-stone-42"))
                 .andExpect(redirectedUrl("/verify")).andReturn();
         MockHttpSession session = (MockHttpSession) registered.getRequest().getSession(false);
         mvc.perform(post("/verify").with(csrf()).session(session)

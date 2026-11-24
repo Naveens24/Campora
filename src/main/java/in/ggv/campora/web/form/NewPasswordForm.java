@@ -2,12 +2,11 @@ package in.ggv.campora.web.form;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 public class NewPasswordForm {
 
     @NotBlank(message = "Choose a password")
-    @Size(min = 8, max = 64, message = "Use 8 to 64 characters")
+    @GoodPassword
     private String password;
 
     @NotBlank(message = "Repeat your password")

@@ -155,6 +155,7 @@ mvn test
   hotspot closing, cancellation re-queue, companion-only filtering, one trip per driver, and two
   drivers racing for the same requests.
 * `PublicRidesTest`: searching without an account, what stays private, and sign-in only when it is needed.
+* `HardeningTest`: sessions, expired forms, password rules, rate limits and browser protections.
 * `AdminPanelTest`: who may use the admin panel, and every account, ride and deletion action in it.
 * `WebSecurityTest`: public pages, role protection, CSRF, the registration → OTP redirect and bad login.
 

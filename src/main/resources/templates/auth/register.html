@@ -5,6 +5,7 @@
 <nav th:replace="~{fragments/layout :: nav}"></nav>
 <main class="container">
   <div class="auth-wrap">
+    <div th:replace="~{fragments/layout :: flash}"></div>
     <div th:replace="~{fragments/layout :: pendingRide}"></div>
     <div class="card-c accent">
       <div class="kicker">Step 1 of 3 · Account</div>

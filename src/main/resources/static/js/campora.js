@@ -90,6 +90,40 @@
     check();
   });
 
+  // Show the chosen stop elsewhere on the page: data-mirror="id of the element"
+  document.querySelectorAll('select[data-mirror]').forEach((select) => {
+    const target = document.getElementById(select.dataset.mirror);
+    if (!target) return;
+    const initial = target.textContent;
+    const show = () => {
+      target.textContent = select.value ? select.selectedOptions[0].textContent.split(' — ')[0] : initial;
+    };
+    select.form.addEventListener('change', show);
+    select.form.addEventListener('click', () => setTimeout(show)); // after a swap
+    show();
+  });
+
+  // Let people check the password they typed
+  document.querySelectorAll('input[type="password"]').forEach((input) => {
+    const box = el('div', 'pw');
+    input.replaceWith(box);
+    const eye = el('button', 'pw-eye');
+    const icon = el('i', 'bi bi-eye');
+    eye.type = 'button';
+    eye.append(icon);
+    const set = (shown) => {
+      input.type = shown ? 'text' : 'password';
+      icon.className = shown ? 'bi bi-eye-slash' : 'bi bi-eye';
+      eye.setAttribute('aria-label', shown ? 'Hide password' : 'Show password');
+    };
+    eye.addEventListener('click', () => set(input.type === 'password'));
+    input.form?.addEventListener('submit', () => set(false));
+    set(false);
+    box.append(input, eye);
+    if (input.autofocus) input.focus();
+    if (input.classList.contains('is-invalid')) box.classList.add('is-invalid');
+  });
+
   // ── helpers ───────────────────────────────────────────────────
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -196,6 +230,7 @@
       if (document.hidden) return;
       try {
         const res = await fetch(endpoint, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+        if (res.status === 401) window.location.reload(); // signed out: show the sign-in page
         if (!res.ok || !(res.headers.get('content-type') || '').includes('json')) return;
         const data = await res.json();
         const nodes = data.hotspots.length
@@ -286,6 +321,7 @@
       if (document.hidden) return;
       try {
         const res = await fetch(endpoint, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+        if (res.status === 401) window.location.reload();
         const next = res.status === 204 ? 'NONE' : (res.ok ? (await res.json()).status : current);
         if (next !== current) window.location.reload();
       } catch (e) { /* ignore */ }
