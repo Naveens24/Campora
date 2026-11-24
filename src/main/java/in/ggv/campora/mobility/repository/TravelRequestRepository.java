@@ -89,6 +89,18 @@ public interface TravelRequestRepository extends JpaRepository<TravelRequest, UU
             """)
     List<TravelRequest> findHistory(@Param("studentId") UUID studentId, Pageable page);
 
+    /** Waiting requests, oldest first, for the admin panel. */
+    @Query("""
+            select r from TravelRequest r
+              join fetch r.pickup
+              join fetch r.destination
+              join fetch r.student s
+              join fetch s.user
+             where r.status = :status
+             order by r.createdAt asc
+            """)
+    List<TravelRequest> findByStatusWithStudent(@Param("status") RequestStatus status, Pageable page);
+
     boolean existsByStudentIdAndStatusIn(UUID studentId, Collection<RequestStatus> statuses);
 
     @Query("""

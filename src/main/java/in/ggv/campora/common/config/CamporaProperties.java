@@ -2,6 +2,7 @@ package in.ggv.campora.common.config;
 
 import java.time.Duration;
 import java.time.ZoneId;
+import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
@@ -16,6 +17,7 @@ public record CamporaProperties(
         @DefaultValue Otp otp,
         @DefaultValue Mail mail,
         @DefaultValue Google google,
+        @DefaultValue Admin admin,
         @DefaultValue Mobility mobility,
         @DefaultValue Companion companion) {
 
@@ -47,6 +49,10 @@ public record CamporaProperties(
         public boolean enabled() {
             return !clientId.isBlank() && !clientSecret.isBlank();
         }
+    }
+
+    /** Verified accounts with one of these addresses own the admin panel. */
+    public record Admin(@DefaultValue List<String> emails) {
     }
 
     public record Mobility(

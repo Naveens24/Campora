@@ -34,7 +34,7 @@ screen.
 | Driver A | `9000000021` | `driver@123`  | Online                                  |
 | Driver B | `9000000022` | `driver@123`  | Online                                  |
 | Driver C | `9000000023` | `driver@123`  | Offline                                 |
-| Admin    | `9000000001` | `admin@123`   | Transport-office control room           |
+| Admin    | `9000000001` | `admin@123`   | Admin panel (not an owner)              |
 
 Students `9000000012`–`9000000018` already have open requests: 10 seats from Engineering Block to
 Rajkishore Nagar, plus one from Main Gate to Bilaspur Railway Station. Student `9000000019` is
@@ -91,6 +91,14 @@ Create an OAuth client (type *Web application*) in Google Cloud with the redirec
 `https://<your-domain>/login/oauth2/code/google` (and `http://localhost:8080/login/oauth2/code/google`
 for local use), then set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Without them the button is hidden.
 
+### Admin panel owner
+
+Set `ADMIN_EMAIL` to the owner's email address (several can be separated by commas) and restart.
+Then sign up on the site with that address and verify it; the account opens the admin panel
+straight away. If the address already belongs to a verified account, that account becomes the
+owner at start-up and stops being a student or driver. Owners can make other people admins.
+There is no default admin and no admin password on the server.
+
 ---
 
 ## 3. Features
@@ -104,7 +112,7 @@ for local use), then set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET`. Without 
 | **Anonymity** | Drivers see only route totals. Names and mobile numbers are loaded only after a request is accepted. |
 | **Companion rides** | Any student can offer seats or join a ride. A join fulfils the student's open request on the same route. |
 | **Stop suggestions** | Students propose missing stops. The admin approves (the stop is added to the network) or rejects. |
-| **Admin** | Live stats, driver blocking, stop network and departments. |
+| **Admin** | Find any account by name, email, mobile or vehicle number. Correct details, set a temporary password, verify, sign out, change role, suspend or delete. End stuck rides, manage stops and departments. Every change is logged. |
 | **History** | A unified journey history (auto, companion and hosted rides) plus request history. |
 | **Expiry** | A scheduled sweep expires stale requests so hotspots always show real, current demand. |
 
@@ -122,7 +130,7 @@ src/main/java/in/ggv/campora
 ├── mobility/      TravelRequest, DriverResponse, MatchingService (demand engine), expiry job
 ├── trip/          Trip lifecycle, journey history
 ├── companion/     CompanionRide, CompanionRideMember
-├── admin/         Control-room service and controller
+├── admin/         Admin panel: users, rides, stops, activity log
 ├── seed/          Demo data (dev profile only)
 └── web/           Student / Driver / Companion controllers, form objects, JSON API
 src/main/resources
@@ -146,6 +154,7 @@ mvn test
 * `MatchingServiceIntegrationTest`: the full demand engine on H2, covering the design-doc scenario,
   hotspot closing, cancellation re-queue, companion-only filtering, one trip per driver, and two
   drivers racing for the same requests.
+* `AdminPanelTest`: who may use the admin panel, and every account, ride and deletion action in it.
 * `WebSecurityTest`: public pages, role protection, CSRF, the registration → OTP redirect and bad login.
 
 ---

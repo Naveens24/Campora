@@ -42,7 +42,7 @@ student_profile 1───∞ destination_request
 | Table | Key columns | Notes |
 |---|---|---|
 | `app_role` | `name` (STUDENT/DRIVER/ADMIN) | |
-| `app_user` | `role_id?`, `first_name`, `last_name`, `email?` ⋆unique, `email_verified_at`, `google_subject?` ⋆unique, `mobile_number?` ⋆unique, `password_hash?`, `status`, `mobile_verified_at` | `role_id` is null until onboarding |
+| `app_user` | `role_id?`, `first_name`, `last_name`, `email?` ⋆unique, `email_verified_at`, `google_subject?` ⋆unique, `mobile_number?` ⋆unique, `password_hash?`, `status`, `mobile_verified_at`, `password_change_required`, `last_login_at` | `role_id` is null until onboarding |
 | `department` | `code` ⋆unique, `name`, `active` | |
 | `destination` | `name` ⋆unique, `area`, `type` (CAMPUS_POINT/CITY), `active`, `sort_order` | Used for both pickup and destination |
 | `student_profile` | `user_id` ⋆unique, `department_id`, `enrollment_no?` (legacy), `semester` | |
@@ -53,6 +53,7 @@ student_profile 1───∞ destination_request
 | `companion_ride` | `host_id`, `pickup_id`, `destination_id`, `departure_time`, `total_seats`, `available_seats`, `status`, `note` | |
 | `companion_ride_member` | `ride_id`, `student_id`, `travel_request_id?`, `seats`, `status` | |
 | `destination_request` | `student_id`, `proposed_name`, `area`, `reason`, `status`, `review_note`, `reviewed_at` | |
+| `admin_action` | `admin_id`, `admin_name`, `target_id?`, `target_name?`, `summary`, `detail?` | Admin log; no foreign keys, so it outlives accounts |
 
 ## Integrity rules
 

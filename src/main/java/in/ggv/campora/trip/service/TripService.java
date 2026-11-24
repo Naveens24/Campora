@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import in.ggv.campora.common.exception.NotFoundException;
 import in.ggv.campora.identity.domain.User;
 import in.ggv.campora.mobility.domain.DriverResponse;
+import in.ggv.campora.mobility.domain.RequestStatus;
 import in.ggv.campora.mobility.domain.ResponseStatus;
 import in.ggv.campora.mobility.domain.TravelRequest;
 import in.ggv.campora.mobility.repository.DriverResponseRepository;
@@ -68,7 +69,9 @@ public class TripService {
     public void complete(UUID driverUserId, UUID tripId) {
         Trip trip = lockOwnedTrip(driverUserId, tripId);
         trip.complete(clock.instant());
-        acceptedResponses(trip).forEach(r -> r.getRequest().markCompleted());
+        acceptedResponses(trip).stream().map(DriverResponse::getRequest)
+                .filter(request -> request.getStatus() == RequestStatus.IN_TRIP) // an admin may have closed one
+                .forEach(TravelRequest::markCompleted);
     }
 
     /** Driver backs out before departure: seats are released and requests return to the hotspot. */

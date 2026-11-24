@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Users')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="block-head">
+      <h1 class="app-title m-0">Users</h1>
+      <a class="btn btn-sm btn-ink" th:href="@{/admin/users/new}"><i class="bi bi-person-plus me-1"></i>Add account</a>
+    </div>
+    <form class="admin-search" th:action="@{/admin/users}" method="get" role="search">
+      <i class="bi bi-search"></i>
+      <input class="form-control" type="search" name="q" th:value="${q}" placeholder="Search name, email, mobile or vehicle number" aria-label="Search users">
+      <input type="hidden" name="show" th:value="${show}">
+      <button type="submit" class="btn btn-route">Search</button>
+    </form>
+    <div class="chips" role="group" aria-label="Filter">
+      <a class="chip" th:each="v : ${views}" th:classappend="${v == show} ? 'on'" th:href="@{/admin/users(show=${v},q=${#strings.isEmpty(q) ? null : q})}" th:text="${v.label}">All</a>
+    </div>
+    <div class="small text-ink-3 mb-2"><span th:text="${users.totalElements} + (${users.totalElements} == 1 ? ' account' : ' accounts')">0 accounts</span>
+      <a class="link-quiet ms-2" th:unless="${#strings.isEmpty(q)}" th:href="@{/admin/users(show=${show})}">Clear search</a></div>
+    <section class="card-c list-card">
+      <div class="empty" th:if="${users.empty}"><i class="bi bi-search"></i>
+        <div class="fw-semibold text-body">No one found</div><div class="small">Try another search or filter.</div></div>
+      <th:block th:each="r : ${users.content}"><a th:replace="~{fragments/admin :: userRow(${r})}"></a></th:block>
+    </section>
+    <div th:replace="~{fragments/admin :: pager(${users}, @{/admin/users(show=${show},q=${q})} + '&')}"></div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

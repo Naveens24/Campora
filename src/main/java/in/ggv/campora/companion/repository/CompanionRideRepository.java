@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -53,6 +54,22 @@ public interface CompanionRideRepository extends JpaRepository<CompanionRide, UU
              order by r.departureTime desc
             """)
     List<CompanionRide> findHostHistory(@Param("hostId") UUID hostId, Pageable page);
+
+    /** Live companion rides, oldest first, for the admin panel. */
+    @Query("""
+            select r from CompanionRide r
+              join fetch r.pickup
+              join fetch r.destination
+              join fetch r.host h
+              join fetch h.user
+             where r.status in :statuses
+             order by r.departureTime asc
+            """)
+    List<CompanionRide> findByStatuses(@Param("statuses") Collection<RideStatus> statuses);
+
+    @Modifying(flushAutomatically = true)
+    @Query("update CompanionRide r set r.note = null where r.host.id = :hostId")
+    void clearNotes(@Param("hostId") UUID hostId);
 
     boolean existsByHostIdAndStatusIn(UUID hostId, Collection<RideStatus> statuses);
 

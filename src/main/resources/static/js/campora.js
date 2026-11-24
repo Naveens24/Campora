@@ -14,11 +14,31 @@
   };
 
   // ── 1. forms ──────────────────────────────────────────────────
+  function ask(question, onYes) {
+    const dialog = el('dialog', 'ask');
+    const acts = el('div', 'ask-acts');
+    const no = el('button', 'btn btn-ghost', 'Cancel');
+    const yes = el('button', 'btn btn-ink', 'Yes, continue');
+    no.type = yes.type = 'button';
+    no.addEventListener('click', () => dialog.close());
+    yes.addEventListener('click', () => { dialog.close(); onYes(); });
+    dialog.addEventListener('close', () => dialog.remove());
+    acts.append(no, yes);
+    dialog.append(el('p', null, question), acts);
+    document.body.append(dialog);
+    dialog.showModal();
+  }
+
   document.addEventListener('submit', (event) => {
     const form = event.target;
     const question = form.getAttribute('data-confirm');
-    if (question && !window.confirm(question)) {
+    if (question && form.dataset.confirmed !== '1') {
       event.preventDefault();
+      const submitter = event.submitter;
+      ask(question, () => {
+        form.dataset.confirmed = '1';
+        form.requestSubmit(submitter && form.contains(submitter) ? submitter : undefined);
+      });
       return;
     }
     form.querySelectorAll('button[type="submit"]').forEach((btn) => {
@@ -29,9 +49,23 @@
 
   // Re-enable buttons if the page is restored from the back/forward cache.
   window.addEventListener('pageshow', () => {
+    document.querySelectorAll('form[data-confirmed]').forEach((form) => delete form.dataset.confirmed);
     document.querySelectorAll('button[type="submit"].disabled').forEach((btn) => {
       btn.disabled = false;
       btn.classList.remove('disabled');
+    });
+  });
+
+  // Copy buttons: data-copy="id of the element whose text to copy"
+  document.querySelectorAll('[data-copy]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const label = button.querySelector('span') || button;
+      try {
+        await navigator.clipboard.writeText(document.getElementById(button.dataset.copy).textContent.trim());
+        label.textContent = 'Copied';
+      } catch (e) {
+        label.textContent = 'Select and copy';
+      }
     });
   });
 

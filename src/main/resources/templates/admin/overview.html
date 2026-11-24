@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Admin')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h1 class="app-title">Overview</h1>
+    <form class="admin-search" th:action="@{/admin/users}" method="get" role="search">
+      <i class="bi bi-search"></i>
+      <input class="form-control" type="search" name="q" placeholder="Search name, email, mobile or vehicle number" aria-label="Search users">
+      <button type="submit" class="btn btn-route">Search</button>
+    </form>
+
+    <div class="tiles">
+      <a class="tile" th:href="@{/admin/users(show='STUDENTS')}"><b th:text="${stats.students()}">0</b><span>Students</span></a>
+      <a class="tile" th:href="@{/admin/users(show='DRIVERS')}"><b th:text="${stats.drivers()}">0</b><span th:text="'Drivers · ' + ${stats.driversOnline()} + ' online'">Drivers</span></a>
+      <a class="tile" th:href="@{/admin/rides}"><b th:text="${stats.openRequests()}">0</b><span>Waiting for a ride</span></a>
+      <a class="tile" th:href="@{/admin/rides}"><b th:text="${stats.activeTrips() + stats.activeCompanionRides()}">0</b><span>Rides live now</span></a>
+      <a class="tile" th:href="@{/admin/rides}"><b th:text="${stats.tripsCompletedToday()}">0</b><span>Trips done today</span></a>
+    </div>
+
+    <div class="todo" th:if="${stats.pendingSuggestions() > 0 or stats.unverified() > 0 or stats.suspended() > 0}">
+      <a th:if="${stats.pendingSuggestions() > 0}" th:href="@{/admin/stops}"><i class="bi bi-pin-map"></i>
+        <span th:text="${stats.pendingSuggestions()} + (${stats.pendingSuggestions()} == 1 ? ' stop suggestion to review' : ' stop suggestions to review')">1 suggestion</span><i class="bi bi-chevron-right"></i></a>
+      <a th:if="${stats.unverified() > 0}" th:href="@{/admin/users(show='UNVERIFIED')}"><i class="bi bi-envelope-exclamation"></i>
+        <span th:text="${stats.unverified()} + (${stats.unverified()} == 1 ? ' account has' : ' accounts have') + ' not verified their email'">1 unverified</span><i class="bi bi-chevron-right"></i></a>
+      <a th:if="${stats.suspended() > 0}" th:href="@{/admin/users(show='SUSPENDED')}"><i class="bi bi-slash-circle"></i>
+        <span th:text="${stats.suspended()} + (${stats.suspended()} == 1 ? ' account is' : ' accounts are') + ' suspended'">1 suspended</span><i class="bi bi-chevron-right"></i></a>
+    </div>
+
+    <div class="row g-3">
+      <div class="col-xl-7">
+        <div class="block-head"><h2>New accounts</h2><a class="link-quiet" th:href="@{/admin/users}">All users</a></div>
+        <section class="card-c list-card">
+          <div class="empty" th:if="${#lists.isEmpty(newest)}"><i class="bi bi-people"></i>No accounts yet.</div>
+          <th:block th:each="r : ${newest}"><a th:replace="~{fragments/admin :: userRow(${r})}"></a></th:block>
+        </section>
+      </div>
+      <div class="col-xl-5">
+        <div class="block-head"><h2>Recent admin activity</h2><a class="link-quiet" th:href="@{/admin/activity}">See all</a></div>
+        <section class="card-c list-card">
+          <div class="empty" th:if="${#lists.isEmpty(actions)}"><i class="bi bi-clock-history"></i>Changes made here will be listed.</div>
+          <ul class="people" th:unless="${#lists.isEmpty(actions)}">
+            <th:block th:each="a : ${actions}"><li th:replace="~{fragments/admin :: actionRow(${a}, true)}"></li></th:block>
+          </ul>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

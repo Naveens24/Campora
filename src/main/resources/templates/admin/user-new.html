@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Add account')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <a class="back-link" th:href="@{/admin/users}"><i class="bi bi-arrow-left"></i>Users</a>
+    <h1 class="app-title">Add account</h1>
+    <section class="card-c form-card">
+      <p class="hint">For someone who can't sign up alone, such as a driver without an email address. You get a temporary password to pass on, and they complete their profile when they sign in.</p>
+      <form th:action="@{/admin/users/new}" th:object="${form}" method="post" novalidate>
+        <div class="alert alert-danger flash" role="alert" th:if="${#fields.hasGlobalErrors()}">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          <div><div th:each="e : ${#fields.globalErrors()}" th:text="${e}">error</div></div>
+        </div>
+        <fieldset class="seg">
+          <input type="radio" id="roleDriver" name="role" value="DRIVER" th:checked="${form.role == null or form.role.name() == 'DRIVER'}"><label for="roleDriver">Driver</label>
+          <input type="radio" id="roleStudent" name="role" value="STUDENT" th:checked="${form.role != null and form.role.name() == 'STUDENT'}"><label for="roleStudent">Student</label>
+        </fieldset>
+        <div class="row g-3">
+          <div class="col-sm-6"><label class="form-label" for="firstName">First name</label>
+            <input class="form-control" th:field="*{firstName}" th:errorclass="is-invalid" maxlength="60" autocomplete="off">
+            <div class="invalid-feedback" th:errors="*{firstName}"></div></div>
+          <div class="col-sm-6"><label class="form-label" for="lastName">Last name</label>
+            <input class="form-control" th:field="*{lastName}" th:errorclass="is-invalid" maxlength="60" autocomplete="off">
+            <div class="invalid-feedback" th:errors="*{lastName}"></div></div>
+          <div class="col-sm-6"><label class="form-label" for="mobile">Mobile number</label>
+            <input class="form-control" th:field="*{mobile}" inputmode="tel" autocomplete="off"></div>
+          <div class="col-sm-6"><label class="form-label" for="email">Email <span class="text-ink-3 fw-normal">(optional)</span></label>
+            <input class="form-control" th:field="*{email}" th:errorclass="is-invalid" type="email" autocomplete="off">
+            <div class="invalid-feedback" th:errors="*{email}"></div></div>
+        </div>
+        <p class="hint mt-3">Check the number and email with the person first. They count as confirmed.</p>
+        <button type="submit" class="btn btn-route">Create account</button>
+      </form>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

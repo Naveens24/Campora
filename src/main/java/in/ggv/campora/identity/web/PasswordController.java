@@ -17,14 +17,18 @@ import in.ggv.campora.common.config.CamporaProperties;
 import in.ggv.campora.common.exception.BusinessException;
 import in.ggv.campora.common.web.Flash;
 import in.ggv.campora.identity.security.ActiveSessions;
+import in.ggv.campora.identity.security.AuthenticationRefresher;
 import in.ggv.campora.identity.security.CamporaUserDetails;
 import in.ggv.campora.identity.service.AccountService;
 import in.ggv.campora.identity.service.OtpService;
+import in.ggv.campora.web.form.NewPasswordForm;
 import in.ggv.campora.web.form.ResetPasswordForm;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
-/** Forgotten password: email a code, then set a new password with it. */
+/** Forgotten password (by emailed code), and replacing a temporary password set by an admin. */
 @Controller
 public class PasswordController {
 
@@ -32,11 +36,14 @@ public class PasswordController {
 
     private final AccountService accounts;
     private final ActiveSessions sessions;
+    private final AuthenticationRefresher refresher;
     private final boolean exposeOtp;
 
-    public PasswordController(AccountService accounts, ActiveSessions sessions, CamporaProperties properties) {
+    public PasswordController(AccountService accounts, ActiveSessions sessions, AuthenticationRefresher refresher,
+                              CamporaProperties properties) {
         this.accounts = accounts;
         this.sessions = sessions;
+        this.refresher = refresher;
         this.exposeOtp = properties.otp().exposeInUi() && properties.mail().from().isBlank();
     }
 
@@ -106,5 +113,32 @@ public class PasswordController {
         sessions.signOutEverywhere(userId);
         Flash.success(attrs, "Password changed. Sign in with your new password.");
         return "redirect:/login";
+    }
+
+    @GetMapping("/account/password")
+    public String changePage(@AuthenticationPrincipal CamporaUserDetails me, Model model) {
+        if (!me.passwordChangeRequired()) {
+            return "redirect:/dashboard";
+        }
+        model.addAttribute("form", new NewPasswordForm());
+        return "auth/new-password";
+    }
+
+    @PostMapping("/account/password")
+    public String change(@AuthenticationPrincipal CamporaUserDetails me,
+                         @Valid @ModelAttribute("form") NewPasswordForm form, BindingResult result,
+                         HttpServletRequest request, HttpServletResponse response, RedirectAttributes attrs) {
+        if (result.hasErrors()) {
+            return "auth/new-password";
+        }
+        try {
+            accounts.replaceTemporaryPassword(me.userId(), form.getPassword());
+        } catch (BusinessException e) {
+            result.reject("password", e.getMessage());
+            return "auth/new-password";
+        }
+        refresher.signIn(me.userId(), request, response);
+        Flash.success(attrs, "Password saved.");
+        return "redirect:/dashboard";
     }
 }

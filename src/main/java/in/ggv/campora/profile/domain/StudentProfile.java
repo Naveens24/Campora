@@ -38,6 +38,11 @@ public class StudentProfile extends BaseEntity {
         this.semester = semester;
     }
 
+    public void update(Department department, int semester) {
+        this.department = department;
+        this.semester = semester;
+    }
+
     public User getUser() {
         return user;
     }

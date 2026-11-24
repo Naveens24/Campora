@@ -27,10 +27,11 @@ public record CamporaUserDetails(
         RoleName role,
         boolean verified,
         boolean profileComplete,
-        boolean suspended) implements UserDetails {
+        boolean blocked,
+        boolean passwordChangeRequired) implements UserDetails {
 
     @Serial
-    private static final long serialVersionUID = 2L;
+    private static final long serialVersionUID = 3L;
 
     /** Authority for users who have not chosen a role yet. */
     public static final String ONBOARDING = "ROLE_ONBOARDING";
@@ -47,17 +48,17 @@ public record CamporaUserDetails(
 
     @Override
     public String getUsername() {
-        return mobile != null ? mobile : userId.toString();   // also the audit name
+        return userId.toString();   // also the audit name, so no phone numbers end up in audit columns
     }
 
     @Override
     public boolean isEnabled() {
-        return !suspended;
+        return !blocked;
     }
 
-    /** Fully onboarded and allowed into the role dashboards. */
+    /** Fully onboarded and allowed into the role dashboards. Admins need no phone number. */
     public boolean ready() {
-        return verified && mobile != null && role != null && profileComplete;
+        return verified && role != null && profileComplete && (mobile != null || isAdmin());
     }
 
     public boolean isStudent() {

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Departments')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h1 class="app-title">Stops &amp; departments</h1>
+    <div class="chips">
+      <a class="chip" th:href="@{/admin/stops}">Stops</a>
+      <a class="chip on" th:href="@{/admin/departments}">Departments</a>
+    </div>
+
+    <div class="block-head"><h2>Add a department</h2></div>
+    <section class="card-c mb-4">
+      <form class="add-row" th:action="@{/admin/departments}" method="post">
+        <input class="form-control add-code text-uppercase" name="code" placeholder="Code" maxlength="16" required aria-label="Code">
+        <input class="form-control" name="name" placeholder="Department name" maxlength="120" required aria-label="Department name">
+        <button type="submit" class="btn btn-route">Add</button>
+      </form>
+    </section>
+
+    <div class="block-head"><h2>All departments</h2><span class="small text-ink-3" th:text="${#lists.size(departments)}">0</span></div>
+    <section class="card-c list-card">
+      <details class="edit-row" th:each="d : ${departments}">
+        <summary>
+          <span class="min-w-0"><b th:text="${d.name()}">Name</b><span class="small text-ink-3" th:text="${d.code()}">MCA</span></span>
+          <span class="pill" th:if="${!d.active()}">Paused</span>
+          <i class="bi bi-chevron-down"></i>
+        </summary>
+        <div class="edit-body">
+          <form class="add-row" th:action="@{/admin/departments/{id}(id=${d.id()})}" method="post">
+            <input class="form-control" name="name" th:value="${d.name()}" maxlength="120" required aria-label="Department name">
+            <button type="submit" class="btn btn-ink">Save</button>
+          </form>
+          <form th:action="@{/admin/departments/{id}/toggle(id=${d.id()})}" method="post">
+            <button type="submit" class="btn btn-sm btn-ghost" th:text="${d.active()} ? 'Pause this department' : 'Resume this department'">Pause</button>
+          </form>
+        </div>
+      </details>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

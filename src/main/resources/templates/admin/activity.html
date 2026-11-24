@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Activity')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h1 class="app-title">Activity</h1>
+    <p class="hint">Every change made in the admin panel.</p>
+    <section class="card-c list-card">
+      <div class="empty" th:if="${actions.empty}"><i class="bi bi-clock-history"></i>Nothing yet.</div>
+      <ul class="people" th:unless="${actions.empty}">
+        <th:block th:each="a : ${actions.content}"><li th:replace="~{fragments/admin :: actionRow(${a}, true)}"></li></th:block>
+      </ul>
+    </section>
+    <div th:replace="~{fragments/admin :: pager(${actions}, @{/admin/activity} + '?')}"></div>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -5,5 +5,11 @@ public enum UserStatus {
     PENDING_VERIFICATION,
     ACTIVE,
     /** Blocked by an administrator; cannot sign in. */
-    SUSPENDED
+    SUSPENDED,
+    /** Personal details erased; the row stays so past rides keep their shape. */
+    DELETED;
+
+    public boolean canSignIn() {
+        return this == ACTIVE || this == PENDING_VERIFICATION;
+    }
 }

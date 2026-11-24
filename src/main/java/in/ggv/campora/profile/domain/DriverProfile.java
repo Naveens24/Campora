@@ -54,6 +54,20 @@ public class DriverProfile extends BaseEntity {
         this.nativeArea = nativeArea;
     }
 
+    public void update(VehicleType vehicleType, String vehicleNumber, int seatCapacity, String nativeArea) {
+        this.vehicleType = vehicleType;
+        this.vehicleNumber = vehicleNumber;
+        this.seatCapacity = seatCapacity;
+        this.nativeArea = nativeArea;
+    }
+
+    /** Frees the number plate and removes the home area of a deleted account. */
+    public void erase() {
+        this.vehicleNumber = "DEL-" + getId().toString().replace("-", "").substring(0, 14);
+        this.nativeArea = null;
+        revokeVerification();
+    }
+
     public void setAvailability(Availability availability) {
         this.availability = availability;
     }

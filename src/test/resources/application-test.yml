@@ -13,3 +13,5 @@ campora:
   google:
     client-id: test-client
     client-secret: test-secret
+  admin:
+    emails: Owner@Example.com

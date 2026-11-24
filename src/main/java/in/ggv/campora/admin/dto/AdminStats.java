@@ -8,5 +8,7 @@ public record AdminStats(
         long activeTrips,
         long tripsCompletedToday,
         long activeCompanionRides,
-        long pendingSuggestions) {
+        long pendingSuggestions,
+        long unverified,
+        long suspended) {
 }

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('User')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <a class="back-link" th:href="@{/admin/users}"><i class="bi bi-arrow-left"></i>Users</a>
+    <div class="u-head">
+      <span class="avatar" th:classappend="${u.role() != null} ? ${'is-' + #strings.toLowerCase(u.role().name())}" th:text="${#strings.substring(u.fullName(), 0, 1)}">A</span>
+      <div class="flex-grow-1 min-w-0">
+        <h1 th:text="${u.fullName()}">Name</h1>
+        <div class="u-pills">
+          <span class="pill" th:classappend="${u.role() == null} ? '' : ${'role-' + #strings.toLowerCase(u.role().name())}" th:text="${u.owner()} ? 'Owner' : (${u.role() == null} ? 'No role yet' : ${@fmt.label(u.role())})">Student</span>
+          <span class="pill approved" th:if="${u.status().name() == 'ACTIVE'}">Active</span>
+          <span class="pill in_trip" th:if="${u.status().name() == 'PENDING_VERIFICATION'}">Not verified</span>
+          <span class="pill rejected" th:if="${u.suspended()}">Suspended</span>
+          <span class="pill rejected" th:if="${u.isDriver() and u.driver() != null and u.driver().blocked()}">Driving blocked</span>
+          <span class="pill approved" th:if="${u.isDriver() and u.driver() != null and u.driver().online()}">Online</span>
+        </div>
+        <div class="u-sub">Joined <span th:text="${@fmt.date(u.joinedAt())}">date</span> · <span th:text="${u.lastLoginAt() == null} ? 'No sign-in recorded' : 'Last signed in ' + ${@fmt.ago(u.lastLoginAt())}">last</span></div>
+      </div>
+      <div class="u-contact">
+        <a class="btn btn-sm btn-ghost" th:if="${u.mobile() != null}" th:href="'tel:+91' + ${u.mobile()}"><i class="bi bi-telephone me-1"></i>Call</a>
+        <a class="btn btn-sm btn-ghost" th:if="${u.email() != null}" th:href="'mailto:' + ${u.email()}"><i class="bi bi-envelope me-1"></i>Email</a>
+      </div>
+    </div>
+    <div class="chips" role="group" aria-label="Sections">
+      <a class="chip" th:classappend="${tab == 'profile'} ? 'on'" th:href="@{/admin/users/{id}(id=${u.id()},tab='profile')}">Profile</a>
+      <a class="chip" th:classappend="${tab == 'rides'} ? 'on'" th:href="@{/admin/users/{id}(id=${u.id()},tab='rides')}">Rides</a>
+      <a class="chip" th:classappend="${tab == 'access'} ? 'on'" th:href="@{/admin/users/{id}(id=${u.id()},tab='access')}">Access</a>
+      <a class="chip" th:classappend="${tab == 'history'} ? 'on'" th:href="@{/admin/users/{id}(id=${u.id()},tab='history')}">History</a>
+    </div>
+
+    <div class="alert alert-info flash" role="note" th:if="${!u.manageable() and (u.self() ? tab == 'access' : tab != 'history')}">
+      <i class="bi bi-info-circle"></i>
+      <div th:text="${u.self()} ? 'This is your own account. Use Forgot password on the sign-in page to change your password.' : 'Only the owner can manage admin accounts.'">note</div>
+    </div>
+
+    <!-- Profile -->
+    <th:block th:if="${tab == 'profile'}">
+      <section class="card-c form-card">
+        <h2 class="card-title-c mb-3">Account details</h2>
+        <form th:action="@{/admin/users/{id}/account(id=${u.id()})}" method="post">
+          <fieldset th:disabled="${!u.editable()}">
+            <div class="row g-3">
+              <div class="col-sm-6"><label class="form-label" for="firstName">First name</label>
+                <input class="form-control" id="firstName" name="firstName" th:value="${u.firstName()}" maxlength="60" required autocomplete="off"></div>
+              <div class="col-sm-6"><label class="form-label" for="lastName">Last name</label>
+                <input class="form-control" id="lastName" name="lastName" th:value="${u.lastName()}" maxlength="60" autocomplete="off"></div>
+              <div class="col-sm-6"><label class="form-label" for="mobile">Mobile number</label>
+                <input class="form-control" id="mobile" name="mobile" th:value="${u.mobile()}" inputmode="tel" th:required="${u.mobile() != null}" autocomplete="off"></div>
+              <div class="col-sm-6"><label class="form-label" for="email">Email</label>
+                <input class="form-control" id="email" name="email" type="email" th:value="${u.email()}" th:required="${u.email() != null}" th:readonly="${u.owner()}" autocomplete="off">
+                <div class="form-text" th:if="${u.owner()}">The owner's email is set on the server.</div></div>
+            </div>
+            <p class="hint mt-3" th:unless="${u.self()}">Whoever controls this email or number can get into the account, so confirm a change with the person first.</p>
+            <button type="submit" class="btn btn-route mt-3" th:classappend="${!u.self()} ? 'mt-0'" th:if="${u.editable()}">Save details</button>
+          </fieldset>
+        </form>
+      </section>
+
+      <section class="card-c form-card" th:if="${u.isStudent()}">
+        <h2 class="card-title-c mb-3">Student details</h2>
+        <p class="hint" th:if="${u.student() == null}">They haven't filled this in yet. You can do it for them.</p>
+        <form th:action="@{/admin/users/{id}/student(id=${u.id()})}" method="post">
+          <fieldset th:disabled="${!u.manageable()}">
+            <div class="row g-3">
+              <div class="col-sm-8"><label class="form-label" for="departmentId">Department</label>
+                <select class="form-select" id="departmentId" name="departmentId" required>
+                  <option value="" th:if="${u.student() == null}">Choose a department</option>
+                  <option th:each="d : ${departments}" th:if="${d.active() or (u.student() != null and u.student().departmentId() == d.id())}" th:value="${d.id()}"
+                          th:text="${d.name()}" th:selected="${u.student() != null and u.student().departmentId() == d.id()}">Dept</option>
+                </select></div>
+              <div class="col-sm-4"><label class="form-label" for="semester">Semester</label>
+                <input class="form-control" id="semester" name="semester" type="number" min="1" max="12" required th:value="${u.student() != null ? u.student().semester() : null}"></div>
+            </div>
+            <button type="submit" class="btn btn-route mt-3" th:if="${u.manageable()}">Save student details</button>
+          </fieldset>
+        </form>
+      </section>
+
+      <section class="card-c form-card" th:if="${u.isDriver()}">
+        <h2 class="card-title-c mb-3">Driver details</h2>
+        <p class="hint" th:if="${u.driver() == null}">They haven't filled this in yet. You can do it for them.</p>
+        <form th:action="@{/admin/users/{id}/driver(id=${u.id()})}" method="post">
+          <fieldset th:disabled="${!u.manageable()}">
+            <div class="row g-3">
+              <div class="col-sm-6"><label class="form-label" for="vehicleType">Vehicle</label>
+                <select class="form-select" id="vehicleType" name="vehicleType">
+                  <option th:each="t : ${vehicleTypes}" th:value="${t}" th:text="${t.label}" th:selected="${u.driver() != null and u.driver().vehicleType() == t}">Auto</option>
+                </select></div>
+              <div class="col-sm-6"><label class="form-label" for="vehicleNumber">Vehicle number</label>
+                <input class="form-control text-uppercase" id="vehicleNumber" name="vehicleNumber" th:value="${u.driver() != null ? u.driver().vehicleNumber() : null}" placeholder="CG10 AB 1234" required autocomplete="off"></div>
+              <div class="col-sm-6"><label class="form-label" for="seatCapacity">Passenger seats</label>
+                <input class="form-control" id="seatCapacity" name="seatCapacity" type="number" min="1" max="12" required th:value="${u.driver() != null ? u.driver().seats() : 5}"></div>
+              <div class="col-sm-6"><label class="form-label" for="nativeArea">Usual area</label>
+                <input class="form-control" id="nativeArea" name="nativeArea" maxlength="120" th:value="${u.driver() != null ? u.driver().area() : null}"></div>
+            </div>
+            <button type="submit" class="btn btn-route mt-3" th:if="${u.manageable()}">Save driver details</button>
+          </fieldset>
+        </form>
+      </section>
+    </th:block>
+
+    <!-- Rides -->
+    <th:block th:if="${tab == 'rides'}" th:with="busy=${!live.trips().empty or !live.companions().empty or !live.waiting().empty}">
+      <div class="block-head"><h2>Active now</h2>
+        <form th:if="${busy}" th:action="@{/admin/users/{id}/clear-rides(id=${u.id()})}" method="post"
+              data-confirm="Take this person out of all active rides? Trips under way are marked complete; others are cancelled.">
+          <button type="submit" class="btn btn-sm btn-ghost">Clear active rides</button></form></div>
+      <section class="card-c list-card">
+        <div class="empty" th:unless="${busy}"><i class="bi bi-check2-circle"></i>No active rides.</div>
+        <ul class="people" th:if="${busy}">
+          <th:block th:each="group : ${ {live.trips(), live.companions(), live.waiting()} }">
+            <li th:each="r : ${group}">
+              <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold text-body" th:text="${r.pickup()} + ' → ' + ${r.destination()}">route</div>
+                <div class="small text-ink-3"><span th:text="${r.person()}">person</span> · <span th:text="${r.seats()} + (${r.seats()} == 1 ? ' seat' : ' seats')">1 seat</span> · <span th:text="${@fmt.when(r.since())}">time</span></div>
+              </div>
+              <span class="pill" th:classappend="${#strings.toLowerCase(r.status().name())}" th:text="${@fmt.label(r.status())}">Open</span>
+            </li>
+          </th:block>
+        </ul>
+      </section>
+
+      <th:block th:if="${trips != null}">
+        <div class="block-head mt-4"><h2>Trips driven</h2></div>
+        <section class="card-c list-card">
+          <div class="empty" th:if="${#lists.isEmpty(trips)}"><i class="bi bi-truck-front"></i>No trips yet.</div>
+          <ul class="people" th:unless="${#lists.isEmpty(trips)}">
+            <li th:each="t : ${trips}"><div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold text-body" th:text="${t.pickup()} + ' → ' + ${t.destination()}">route</div>
+              <div class="small text-ink-3"><span th:text="${@fmt.when(t.createdAt())}">time</span> · <span th:text="${t.seats()} + (${t.seats()} == 1 ? ' seat' : ' seats')">5 seats</span></div></div>
+              <span class="pill" th:classappend="${#strings.toLowerCase(t.status().name())}" th:text="${@fmt.label(t.status())}">Done</span></li>
+          </ul>
+        </section>
+      </th:block>
+
+      <th:block th:if="${journeys != null}">
+        <div class="block-head mt-4"><h2>Journeys</h2></div>
+        <section class="card-c list-card">
+          <div class="empty" th:if="${#lists.isEmpty(journeys)}"><i class="bi bi-signpost-split"></i>No journeys yet.</div>
+          <ul class="people" th:unless="${#lists.isEmpty(journeys)}">
+            <li th:each="j : ${journeys}"><div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold text-body" th:text="${j.pickup()} + ' → ' + ${j.destination()}">route</div>
+              <div class="small text-ink-3"><span th:text="${@fmt.when(j.when())}">time</span> · <span th:text="${j.kind() == 'HOSTED' ? 'Hosted the ride' : j.counterpart()}">with</span></div></div>
+              <span class="pill" th:classappend="${#strings.toLowerCase(j.status())}" th:text="${#strings.capitalize(#strings.replace(#strings.toLowerCase(j.status()), '_', ' '))}">Done</span></li>
+          </ul>
+        </section>
+        <div class="block-head mt-4"><h2>Requests</h2></div>
+        <section class="card-c list-card">
+          <div class="empty" th:if="${#lists.isEmpty(requests)}"><i class="bi bi-geo-alt"></i>No requests yet.</div>
+          <ul class="people" th:unless="${#lists.isEmpty(requests)}">
+            <li th:each="r : ${requests}"><div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold text-body" th:text="${r.pickup()} + ' → ' + ${r.destination()}">route</div>
+              <div class="small text-ink-3"><span th:text="${@fmt.when(r.createdAt())}">time</span> · <span th:text="${r.seats()} + (${r.seats()} == 1 ? ' seat' : ' seats')">1 seat</span></div></div>
+              <span class="pill" th:classappend="${#strings.toLowerCase(r.status().name())}" th:text="${@fmt.label(r.status())}">Done</span></li>
+          </ul>
+        </section>
+      </th:block>
+    </th:block>
+
+    <!-- Access -->
+    <th:block th:if="${tab == 'access' and (u.manageable() or u.self())}">
+      <div class="temp-pass" th:if="${temporaryPassword != null}">
+        <div class="label">Temporary password</div>
+        <div class="temp-row"><code id="tempPass" th:text="${temporaryPassword}">abcd-efgh-jkmn</code>
+          <button type="button" class="btn btn-sm btn-ink" data-copy="tempPass"><i class="bi bi-copy me-1"></i><span>Copy</span></button></div>
+        <p class="mb-0">Shown only once. They sign in with <strong th:text="${u.mobile() != null ? u.mobile() : u.email()}">number</strong> and this password, then choose their own.</p>
+      </div>
+
+      <div class="block-head"><h2>Signing in</h2></div>
+      <section class="card-c set-list">
+        <div class="set"><div><b>Password</b><span th:text="${u.temporaryPassword()} ? 'Temporary password, not changed yet' : (${u.hasPassword()} ? 'Set' : 'None, signs in with Google only')">Set</span></div>
+          <th:block th:if="${u.manageable()}"><form th:action="@{/admin/users/{id}/temporary-password(id=${u.id()})}" method="post" data-confirm="Replace the password with a temporary one? You will see it once, and they are signed out on every device."><button type="submit" class="btn btn-sm btn-ink">Reset password</button></form></th:block></div>
+        <div class="set"><div><b>Verification</b><span th:text="${u.emailVerified()} ? 'Email verified' : (${u.verified()} ? 'Verified by mobile number' : 'Email not verified yet')">Verified</span></div>
+          <th:block th:if="${u.manageable() and !u.verified()}"><form th:action="@{/admin/users/{id}/verify(id=${u.id()})}" method="post" data-confirm="Mark this account as verified? Only do this if you know the person owns this email or number."><button type="submit" class="btn btn-sm btn-ghost">Mark as verified</button></form></th:block></div>
+        <div class="set"><div><b>Google</b><span th:text="${u.googleLinked()} ? 'Connected' : 'Not connected'">Not connected</span></div>
+          <th:block th:if="${u.manageable() and u.googleLinked()}"><form th:action="@{/admin/users/{id}/disconnect-google(id=${u.id()})}" method="post" data-confirm="Disconnect Google sign-in from this account?"><button type="submit" class="btn btn-sm btn-ghost">Disconnect</button></form></th:block></div>
+        <div class="set" th:if="${u.manageable()}"><div><b>Devices</b><span>End every session, for example after a lost phone</span></div>
+          <form th:action="@{/admin/users/{id}/sign-out(id=${u.id()})}" method="post" data-confirm="Sign this person out on all devices?"><button type="submit" class="btn btn-sm btn-ghost">Sign out everywhere</button></form></div>
+      </section>
+
+      <th:block th:if="${u.manageable()}">
+        <div class="block-head mt-4"><h2>Role</h2></div>
+        <section class="card-c set-list">
+          <div class="set" th:if="${!u.isStudent()}"><div><b>Student</b><span>Requests and shares rides</span></div>
+            <form th:action="@{/admin/users/{id}/role(id=${u.id()})}" method="post" data-confirm="Change this account to a student? Active rides are cleared and they are signed out."><input type="hidden" name="role" value="STUDENT"><button type="submit" class="btn btn-sm btn-ghost">Change to student</button></form></div>
+          <div class="set" th:if="${!u.isDriver()}"><div><b>Driver</b><span>Accepts ride requests</span></div>
+            <form th:action="@{/admin/users/{id}/role(id=${u.id()})}" method="post" data-confirm="Change this account to a driver? Active rides are cleared and they are signed out."><input type="hidden" name="role" value="DRIVER"><button type="submit" class="btn btn-sm btn-ghost">Change to driver</button></form></div>
+          <div class="set" th:if="${!u.isAdmin() and u.canGrantAdmin()}"><div><b>Admin</b><span>Manages all students and drivers</span></div>
+            <form th:action="@{/admin/users/{id}/role(id=${u.id()})}" method="post" data-confirm="Make this person an admin? They will be able to manage every student and driver."><input type="hidden" name="role" value="ADMIN"><button type="submit" class="btn btn-sm btn-ghost">Make admin</button></form></div>
+        </section>
+
+        <div class="block-head mt-4"><h2>Account status</h2></div>
+        <section class="card-c set-list">
+          <div class="set" th:if="${u.isDriver() and u.driver() != null}"><div><b>Driving</b><span th:text="${u.driver().blocked()} ? 'Blocked. They can sign in but not take rides.' : 'Allowed to take rides'">Allowed</span></div>
+            <form th:action="@{/admin/users/{id}/driving(id=${u.id()})}" method="post" th:attr="data-confirm=${u.driver().blocked() ? null : 'Block this driver from taking rides?'}">
+              <input type="hidden" name="blocked" th:value="${!u.driver().blocked()}">
+              <button type="submit" class="btn btn-sm btn-ghost" th:text="${u.driver().blocked()} ? 'Allow driving' : 'Block driving'">Block</button></form></div>
+          <div class="set" th:if="${u.suspended()}"><div><b>Suspended</b><span>They can't sign in</span></div>
+            <form th:action="@{/admin/users/{id}/reactivate(id=${u.id()})}" method="post"><button type="submit" class="btn btn-sm btn-ink">Reactivate</button></form></div>
+          <div class="set set-wide" th:unless="${u.suspended()}"><div><b>Suspend account</b><span>They are signed out, taken out of active rides and can't sign in until you reactivate them.</span></div>
+            <form class="suspend-form" th:action="@{/admin/users/{id}/suspend(id=${u.id()})}" method="post" data-confirm="Suspend this account now?">
+              <input class="form-control form-control-sm" name="reason" maxlength="300" placeholder="Reason (only admins see it)" aria-label="Reason">
+              <button type="submit" class="btn btn-sm btn-danger-c">Suspend</button></form></div>
+          <div class="set"><div><b>Delete account</b><span>Erases their personal details for good</span></div>
+            <a class="btn btn-sm btn-danger-c" th:href="@{/admin/users/{id}/delete(id=${u.id()})}">Delete…</a></div>
+        </section>
+      </th:block>
+    </th:block>
+
+    <!-- History -->
+    <section class="card-c list-card" th:if="${tab == 'history'}">
+      <div class="empty" th:if="${#lists.isEmpty(actions)}"><i class="bi bi-clock-history"></i>No admin has changed this account.</div>
+      <ul class="people" th:unless="${#lists.isEmpty(actions)}">
+        <th:block th:each="a : ${actions}"><li th:replace="~{fragments/admin :: actionRow(${a}, false)}"></li></th:block>
+      </ul>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

@@ -1,5 +1,6 @@
 package in.ggv.campora.profile.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -25,8 +26,9 @@ public interface DriverProfileRepository extends JpaRepository<DriverProfile, UU
     @Query("select d from DriverProfile d join fetch d.user where d.user.id = :userId")
     Optional<DriverProfile> findDetailedByUserId(@Param("userId") UUID userId);
 
-    @Query("select d from DriverProfile d join fetch d.user order by d.verified asc, d.createdAt desc")
-    List<DriverProfile> findAllWithUser();
+    List<DriverProfile> findByUserIdIn(Collection<UUID> userIds);
+
+    Optional<DriverProfile> findByVehicleNumberIgnoreCase(String vehicleNumber);
 
     boolean existsByUserId(UUID userId);
 

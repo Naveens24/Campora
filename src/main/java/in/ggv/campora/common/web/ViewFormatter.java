@@ -25,6 +25,7 @@ public class ViewFormatter {
 
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("h:mm a", Locale.ENGLISH);
     private static final DateTimeFormatter DATE_TIME = DateTimeFormatter.ofPattern("d MMM, h:mm a", Locale.ENGLISH);
+    private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ENGLISH);
     private static final DateTimeFormatter INPUT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     private final ZoneId zone;
@@ -67,7 +68,17 @@ public class ViewFormatter {
         if (minutes < 60) {
             return minutes + " min ago";
         }
-        return (minutes / 60) + " h ago";
+        long hours = minutes / 60;
+        if (hours < 24) {
+            return hours + " h ago";
+        }
+        long days = hours / 24;
+        return days == 1 ? "1 day ago" : days < 30 ? days + " days ago" : "on " + date(instant);
+    }
+
+    /** "12 Sep 2026". */
+    public String date(Instant instant) {
+        return instant == null ? "—" : DATE.format(instant.atZone(zone));
     }
 
     /** How long someone has been waiting: "Just now", "4 min", "2 h". */

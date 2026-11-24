@@ -13,7 +13,6 @@ import in.ggv.campora.common.exception.BusinessException;
 import in.ggv.campora.common.exception.NotFoundException;
 import in.ggv.campora.identity.domain.RoleName;
 import in.ggv.campora.identity.domain.User;
-import in.ggv.campora.identity.domain.UserStatus;
 import in.ggv.campora.identity.repository.UserRepository;
 import in.ggv.campora.identity.service.MobileNumbers;
 import in.ggv.campora.profile.repository.DriverProfileRepository;
@@ -67,6 +66,6 @@ public class CamporaUserDetailsService implements UserDetailsService {
         return new CamporaUserDetails(user.getId(), user.getEmail(), user.getMobileNumber(),
                 user.getPasswordHash(),
                 user.getFirstName(), user.getFullName(), role, user.isVerified(), profileComplete,
-                user.getStatus() == UserStatus.SUSPENDED);
+                !user.getStatus().canSignIn(), user.isPasswordChangeRequired());
     }
 }

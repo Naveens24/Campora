@@ -22,12 +22,14 @@ public class AuthenticationRefresher {
 
     private final CamporaUserDetailsService userDetailsService;
     private final SecurityContextRepository contextRepository;
+    private final SignInRecorder signIns;
     private final SecurityContextHolderStrategy holder = SecurityContextHolder.getContextHolderStrategy();
 
     public AuthenticationRefresher(CamporaUserDetailsService userDetailsService,
-                                   SecurityContextRepository contextRepository) {
+                                   SecurityContextRepository contextRepository, SignInRecorder signIns) {
         this.userDetailsService = userDetailsService;
         this.contextRepository = contextRepository;
+        this.signIns = signIns;
     }
 
     public CamporaUserDetails signIn(UUID userId, HttpServletRequest request, HttpServletResponse response) {
@@ -42,6 +44,7 @@ public class AuthenticationRefresher {
         context.setAuthentication(authentication);
         holder.setContext(context);
         contextRepository.saveContext(context, request, response);
+        signIns.record(userId);
         return principal;
     }
 }

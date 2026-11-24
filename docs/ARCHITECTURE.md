@@ -109,13 +109,19 @@ request (it becomes `MATCHED`), so demand is never counted twice and auto driver
 * **Authorisation:** URL rules (`/student/**`, `/companion/**` → STUDENT; `/driver/**` → DRIVER;
   `/admin/**` → ADMIN). Every service also checks ownership (for example, a driver can act only on
   their own trip). Records that aren't the user's return 404, not 403, so their existence isn't leaked.
+* **Admin panel:** owners come from `ADMIN_EMAIL` and count only with a verified address. Admins manage
+  students and drivers; only owners manage admins. `AdminGuard` re-reads the acting admin on every change,
+  so a removed admin's open session is useless. Temporary passwords must be replaced at the next sign-in.
+  Every change is written to `admin_action`.
+* **Sign-in throttle:** ten wrong passwords for one account from one address pause sign-in for 15 minutes.
 * **Onboarding gate:** `OnboardingInterceptor` redirects until verify → role → profile are all done.
   `AuthenticationRefresher` re-issues the session (with a new session ID) after each step.
 * **Web hardening:** CSRF on all forms, strict Content-Security-Policy (scripts only from `'self'`,
   no inline JS), `X-Frame-Options: DENY`, referrer policy, HttpOnly + SameSite session cookie,
   Secure cookie in prod, no stack traces in error pages, open-redirect-safe "go back" handling.
 * **Privacy:** hotspots are aggregates, and passenger or driver contact details are loaded only for
-  accepted matches.
+  accepted matches. Audit columns hold account ids, never phone numbers. Deleting an account erases the
+  name, contact details, credentials, vehicle number and free text; rides stay as "Deleted user".
 
 ## 6. Performance and optimisation
 

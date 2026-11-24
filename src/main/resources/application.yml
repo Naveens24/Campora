@@ -106,6 +106,8 @@ campora:
   google:                    # secrets stay in the environment, never in git
     client-id: ${GOOGLE_CLIENT_ID:}
     client-secret: ${GOOGLE_CLIENT_SECRET:}
+  admin:
+    emails: ${ADMIN_EMAIL:}    # owner(s) of the admin panel, comma separated
   mobility:
     request-ttl: PT45M         # an OPEN request expires after this
     max-seats-per-request: 4

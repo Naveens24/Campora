@@ -43,7 +43,7 @@ class OtpServiceTest {
     private final OtpService otp = new OtpService(
             new CamporaProperties("UTC", false,
                     new CamporaProperties.Otp(6, Duration.ofMinutes(5), 5, Duration.ofSeconds(30), false),
-                    null, null, null, null),
+                    null, null, null, null, null),
             (purpose, email, code, validity) -> {
                 if (mailDown) {
                     throw new BusinessException("down");

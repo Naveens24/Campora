@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Walks a signed-in user through onboarding in order:
- * verify email → add mobile → choose role → complete profile. Until all are done,
+ * replace a temporary password → verify email → add mobile → choose role → complete profile. Until all are done,
  * every page redirects to the next pending step.
  */
 @Component
@@ -20,11 +20,14 @@ public class OnboardingInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !(auth.getPrincipal() instanceof CamporaUserDetails user) || user.ready()) {
+        if (auth == null || !(auth.getPrincipal() instanceof CamporaUserDetails user) 
+                || user.ready() && !user.passwordChangeRequired()) {
             return true;
         }
         String target;
-        if (!user.verified()) {
+        if (user.passwordChangeRequired()) {
+            target = "/account/password";
+        } else if (!user.verified()) {
             target = "/verify";
         } else if (user.mobile() == null) {
             target = "/onboarding/contact";

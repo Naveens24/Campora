@@ -5,6 +5,7 @@ import java.util.Map;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -12,12 +13,20 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.ExceptionMappingAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.DelegatingSecurityContextRepository;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
+
+import jakarta.servlet.Filter;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Security model
@@ -45,7 +54,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityContextRepository contextRepository,
                                                    ObjectProvider<ClientRegistrationRepository> googleClient,
-                                                   GoogleLoginHandler googleLogin)
+                                                   GoogleLoginHandler googleLogin, LoginThrottle throttle)
             throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
@@ -62,12 +71,13 @@ public class SecurityConfig {
                 .usernameParameter("mobile")
                 .passwordParameter("password")
                 .defaultSuccessUrl("/dashboard", true)
-                .failureHandler(failureHandler())
+                .failureHandler(failureHandler(throttle))
                 .permitAll())
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
                 .deleteCookies("JSESSIONID"))
+            .addFilterBefore(throttleFilter(throttle), UsernamePasswordAuthenticationFilter.class)
             .securityContext(ctx -> ctx.securityContextRepository(contextRepository))
             .headers(headers -> headers
                 .contentSecurityPolicy(csp -> csp.policyDirectives(CSP))
@@ -94,10 +104,26 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(11);
     }
 
-    private ExceptionMappingAuthenticationFailureHandler failureHandler() {
+    private static AuthenticationFailureHandler failureHandler(LoginThrottle throttle) {
         var handler = new ExceptionMappingAuthenticationFailureHandler();
         handler.setDefaultFailureUrl("/login?error");
         handler.setExceptionMappings(Map.of(DisabledException.class.getName(), "/login?suspended"));
-        return handler;
+        return (request, response, exception) -> {
+            throttle.failed(request);
+            handler.onAuthenticationFailure(request, response, exception);
+        };
+    }
+
+    private static Filter throttleFilter(LoginThrottle throttle) {
+        // The same kind of matcher the login itself uses, so no spelling of the URL gets around it.
+        RequestMatcher login = PathPatternRequestMatcher.withDefaults().matcher(HttpMethod.POST, "/login");
+        return (request, response, chain) -> {
+            HttpServletRequest http = (HttpServletRequest) request;
+            if (login.matches(http) && throttle.blocked(http)) {
+                ((HttpServletResponse) response).sendRedirect(http.getContextPath() + "/login?locked");
+                return;
+            }
+            chain.doFilter(request, response);
+        };
     }
 }

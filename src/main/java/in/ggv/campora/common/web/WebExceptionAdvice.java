@@ -59,7 +59,7 @@ public class WebExceptionAdvice {
         return "redirect:" + safeReferer(request);
     }
 
-    /** Same-site path of the Referer header, or /dashboard. Never an open redirect. */
+    /** Same-site path (and tab) of the Referer header, or /dashboard. Never an open redirect. */
     static String safeReferer(HttpServletRequest request) {
         String referer = request.getHeader("Referer");
         if (referer != null) {
@@ -72,7 +72,9 @@ public class WebExceptionAdvice {
                     if (!contextPath.isEmpty() && path.startsWith(contextPath)) {
                         path = path.substring(contextPath.length());
                     }
-                    return path.isEmpty() ? "/dashboard" : path;
+                    String query = uri.getRawQuery();
+                    boolean tab = query != null && query.matches("tab=[a-z]+");
+                    return path.isEmpty() ? "/dashboard" : tab ? path + "?" + query : path;
                 }
             } catch (IllegalArgumentException ignored) {
                 // malformed header — fall through

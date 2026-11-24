@@ -59,6 +59,13 @@ public class User extends BaseEntity {
     @Column(name = "mobile_verified_at")
     private Instant mobileVerifiedAt;
 
+    /** Set with a temporary password: the next sign-in must choose a new one. */
+    @Column(name = "password_change_required", nullable = false)
+    private boolean passwordChangeRequired;
+
+    @Column(name = "last_login_at")
+    private Instant lastLoginAt;
+
     protected User() {
     }
 
@@ -85,6 +92,41 @@ public class User extends BaseEntity {
 
     public void linkGoogle(String subject) {
         this.googleSubject = subject;
+    }
+
+    public void unlinkGoogle() {
+        this.googleSubject = null;
+    }
+
+    public boolean isGoogleLinked() {
+        return googleSubject != null;
+    }
+
+    public void rename(String firstName, String lastName) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
+    /** An address an admin has confirmed with its owner. */
+    public void setConfirmedEmail(String email, Instant at) {
+        this.email = email;
+        this.emailVerifiedAt = at;
+    }
+
+    /** Removes everything that identifies the person. Cannot be undone. */
+    public void erase() {
+        this.firstName = "Deleted";
+        this.lastName = "user";
+        this.email = null;
+        this.emailVerifiedAt = null;
+        this.googleSubject = null;
+        this.mobileNumber = null;
+        this.mobileVerifiedAt = null;
+        this.passwordHash = null;
+        this.passwordChangeRequired = false;
+        this.lastLoginAt = null;
+        this.role = null;
+        this.status = UserStatus.DELETED;
     }
 
     public void setMobileNumber(String mobileNumber) {
@@ -145,6 +187,20 @@ public class User extends BaseEntity {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+        this.passwordChangeRequired = false;
+    }
+
+    public void setTemporaryPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+        this.passwordChangeRequired = true;
+    }
+
+    public boolean isPasswordChangeRequired() {
+        return passwordChangeRequired;
+    }
+
+    public Instant getLastLoginAt() {
+        return lastLoginAt;
     }
 
     public String getPasswordHash() {

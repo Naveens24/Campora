@@ -1,25 +1,11 @@
 package in.ggv.campora.web.form;
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
-public class ResetPasswordForm {
+public class ResetPasswordForm extends NewPasswordForm {
 
     @NotBlank(message = "Enter the code from your email")
     private String code;
-
-    @NotBlank(message = "Choose a password")
-    @Size(min = 8, max = 64, message = "Use 8 to 64 characters")
-    private String password;
-
-    @NotBlank(message = "Repeat your password")
-    private String confirmPassword;
-
-    @AssertTrue(message = "Passwords do not match")
-    public boolean isPasswordConfirmed() {
-        return password == null || password.equals(confirmPassword);
-    }
 
     public String getCode() {
         return code;
@@ -27,21 +13,5 @@ public class ResetPasswordForm {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getConfirmPassword() {
-        return confirmPassword;
-    }
-
-    public void setConfirmPassword(String confirmPassword) {
-        this.confirmPassword = confirmPassword;
     }
 }

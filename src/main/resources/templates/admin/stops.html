@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Stops')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <h1 class="app-title">Stops &amp; departments</h1>
+    <div class="chips">
+      <a class="chip on" th:href="@{/admin/stops}">Stops</a>
+      <a class="chip" th:href="@{/admin/departments}">Departments</a>
+    </div>
+
+    <th:block th:unless="${#lists.isEmpty(suggestions)}">
+      <div class="block-head"><h2>Suggested by students</h2></div>
+      <section class="card-c list-card mb-4">
+        <div class="suggestion" th:each="s : ${suggestions}">
+          <div class="min-w-0">
+            <div class="fw-semibold text-body" th:text="${s.proposedName()}">Place</div>
+            <div class="small text-ink-3"><span th:text="${s.area() ?: 'No area given'}">area</span> · <span th:text="${s.studentName()}">student</span> · <span th:text="${@fmt.ago(s.createdAt())}">ago</span></div>
+            <div class="small mt-1" th:if="${s.reason() != null}" th:text="'“' + ${s.reason()} + '”'">reason</div>
+          </div>
+          <div class="suggestion-acts">
+            <form th:action="@{/admin/suggestions/{id}/approve(id=${s.id()})}" method="post">
+              <select class="form-select form-select-sm" name="type" aria-label="Stop type">
+                <option th:each="t : ${locationTypes}" th:value="${t}" th:text="${t.name() == 'CITY' ? 'City' : 'Campus'}" th:selected="${t.name() == 'CITY'}">City</option>
+              </select>
+              <button type="submit" class="btn btn-sm btn-route">Approve</button>
+            </form>
+            <form th:action="@{/admin/suggestions/{id}/reject(id=${s.id()})}" method="post">
+              <input class="form-control form-control-sm" name="note" placeholder="Reason (optional)" maxlength="300" aria-label="Reason">
+              <button type="submit" class="btn btn-sm btn-ghost">Reject</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </th:block>
+
+    <div class="block-head"><h2>Add a stop</h2></div>
+    <section class="card-c mb-4">
+      <form class="add-row" th:action="@{/admin/stops}" method="post">
+        <input class="form-control" name="name" placeholder="Stop name" maxlength="120" required aria-label="Stop name">
+        <input class="form-control" name="area" placeholder="Area (optional)" maxlength="120" aria-label="Area">
+        <select class="form-select" name="type" aria-label="Stop type">
+          <option th:each="t : ${locationTypes}" th:value="${t}" th:text="${t.name() == 'CITY' ? 'City' : 'Campus'}" th:selected="${t.name() == 'CITY'}">City</option>
+        </select>
+        <button type="submit" class="btn btn-route">Add</button>
+      </form>
+    </section>
+
+    <div class="block-head"><h2>All stops</h2><span class="small text-ink-3" th:text="${#lists.size(locations)}">0</span></div>
+    <section class="card-c list-card">
+      <details class="edit-row" th:each="l : ${locations}">
+        <summary>
+          <span class="min-w-0"><b th:text="${l.name()}">Stop</b><span class="small text-ink-3" th:if="${l.area() != null}" th:text="${l.area()}">area</span></span>
+          <span class="pill" th:if="${!l.active()}">Paused</span>
+          <span class="pill" th:classappend="${l.onCampus()} ? 'open' : 'hosted'" th:text="${l.onCampus()} ? 'Campus' : 'City'">City</span>
+          <i class="bi bi-chevron-down"></i>
+        </summary>
+        <div class="edit-body">
+          <form class="add-row" th:action="@{/admin/stops/{id}(id=${l.id()})}" method="post">
+            <input class="form-control" name="name" th:value="${l.name()}" maxlength="120" required aria-label="Stop name">
+            <input class="form-control" name="area" th:value="${l.area()}" placeholder="Area (optional)" maxlength="120" aria-label="Area">
+            <button type="submit" class="btn btn-ink">Save</button>
+          </form>
+          <form th:action="@{/admin/stops/{id}/toggle(id=${l.id()})}" method="post">
+            <button type="submit" class="btn btn-sm btn-ghost" th:text="${l.active()} ? 'Pause this stop' : 'Resume this stop'">Pause</button>
+          </form>
+        </div>
+      </details>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

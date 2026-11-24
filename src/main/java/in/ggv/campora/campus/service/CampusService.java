@@ -95,8 +95,25 @@ public class CampusService {
 
     @Transactional
     @CacheEvict(value = CacheConfig.LOCATIONS, allEntries = true)
-    public void toggleLocation(UUID id) {
-        destinations.findById(id).orElseThrow(() -> new NotFoundException("Stop")).toggleActive();
+    public boolean toggleLocation(UUID id) {
+        Destination stop = requireLocation(id);
+        stop.toggleActive();
+        return stop.isActive();
+    }
+
+    @Transactional
+    @CacheEvict(value = CacheConfig.LOCATIONS, allEntries = true)
+    public void renameLocation(UUID id, String name, String area) {
+        Destination stop = requireLocation(id);
+        String clean = name.trim();
+        if (!clean.equalsIgnoreCase(stop.getName()) && destinations.existsByNameIgnoreCase(clean)) {
+            throw new BusinessException("A stop named \"" + clean + "\" already exists.");
+        }
+        stop.rename(clean, blankToNull(area));
+    }
+
+    public String locationName(UUID id) {
+        return requireLocation(id).getName();
     }
 
     @Transactional
@@ -111,8 +128,28 @@ public class CampusService {
 
     @Transactional
     @CacheEvict(value = CacheConfig.DEPARTMENTS, allEntries = true)
-    public void toggleDepartment(UUID id) {
-        departments.findById(id).orElseThrow(() -> new NotFoundException("Department")).toggleActive();
+    public boolean toggleDepartment(UUID id) {
+        Department department = requireDepartment(id);
+        department.toggleActive();
+        return department.isActive();
+    }
+
+    @Transactional
+    @CacheEvict(value = CacheConfig.DEPARTMENTS, allEntries = true)
+    public void renameDepartment(UUID id, String name) {
+        requireDepartment(id).rename(name.trim());
+    }
+
+    public String departmentName(UUID id) {
+        return requireDepartment(id).getName();
+    }
+
+    private Destination requireLocation(UUID id) {
+        return destinations.findById(id).orElseThrow(() -> new NotFoundException("Stop"));
+    }
+
+    private Department requireDepartment(UUID id) {
+        return departments.findById(id).orElseThrow(() -> new NotFoundException("Department"));
     }
 
     private static String blankToNull(String s) {

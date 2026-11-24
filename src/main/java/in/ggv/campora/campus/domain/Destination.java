@@ -45,6 +45,11 @@ public class Destination extends BaseEntity {
         this.sortOrder = sortOrder;
     }
 
+    public void rename(String name, String area) {
+        this.name = name;
+        this.area = area;
+    }
+
     public void toggleActive() {
         this.active = !this.active;
     }

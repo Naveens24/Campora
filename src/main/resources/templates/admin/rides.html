@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Rides')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <div class="block-head"><h1 class="app-title m-0">Rides</h1><a class="link-quiet" th:href="@{/admin/rides}"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</a></div>
+    <div class="block-head "><h2>Driver trips</h2><span class="small text-ink-3" th:text="${#lists.size(live.trips())}">0</span></div>
+    <section class="card-c list-card">
+      <div class="empty" th:if="${#lists.isEmpty(live.trips())}"><i class="bi bi-truck-front"></i>No driver trips right now.</div>
+      <ul class="people" th:unless="${#lists.isEmpty(live.trips())}">
+        <li class="ride-line" th:each="r : ${live.trips()}">
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-body" th:text="${r.pickup()} + ' → ' + ${r.destination()}">route</div>
+            <div class="small text-ink-3"><a th:href="@{/admin/users/{id}(id=${r.userId()},tab='rides')}" th:text="${r.person()}">Name</a> · <span th:text="${r.seats()} + (${r.seats()} == 1 ? ' seat' : ' seats')">1 seat</span> · <span th:text="(${r.started()} ? 'started ' : 'accepted ') + ${@fmt.ago(r.since())}">since</span></div>
+          </div>
+          <span class="pill" th:classappend="${#strings.toLowerCase(r.status().name())}" th:text="${@fmt.label(r.status())}">Open</span>
+          <form th:action="@{/admin/rides/trips/{id}/end(id=${r.id()})}" method="post" th:data-confirm="${r.started()} ? 'Mark this trip as complete for everyone in it?' : 'Cancel this trip? Its passengers go back to waiting.'"><button type="submit" class="btn btn-sm btn-ghost" th:text="${r.started()} ? 'Complete' : 'Cancel'">End</button></form>
+        </li>
+      </ul>
+    </section>
+    <div class="block-head mt-4"><h2>Companion rides</h2><span class="small text-ink-3" th:text="${#lists.size(live.companions())}">0</span></div>
+    <section class="card-c list-card">
+      <div class="empty" th:if="${#lists.isEmpty(live.companions())}"><i class="bi bi-people"></i>No companion rides right now.</div>
+      <ul class="people" th:unless="${#lists.isEmpty(live.companions())}">
+        <li class="ride-line" th:each="r : ${live.companions()}">
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-body" th:text="${r.pickup()} + ' → ' + ${r.destination()}">route</div>
+            <div class="small text-ink-3"><a th:href="@{/admin/users/{id}(id=${r.userId()},tab='rides')}" th:text="${r.person()}">Name</a> · <span th:text="${r.seats()} + (${r.seats()} == 1 ? ' seat joined' : ' seats joined')">1 seat</span> · <span th:text="(${r.started()} ? 'left ' : 'leaves ') + ${@fmt.when(r.since())}">since</span></div>
+          </div>
+          <span class="pill" th:classappend="${#strings.toLowerCase(r.status().name())}" th:text="${@fmt.label(r.status())}">Open</span>
+          <form th:action="@{/admin/rides/companion/{id}/end(id=${r.id()})}" method="post" th:data-confirm="${r.started()} ? 'Mark this ride as complete for everyone in it?' : 'Cancel this ride? Everyone who joined is released.'"><button type="submit" class="btn btn-sm btn-ghost" th:text="${r.started()} ? 'Complete' : 'Cancel'">End</button></form>
+        </li>
+      </ul>
+    </section>
+    <div class="block-head mt-4"><h2>Waiting for a ride</h2><span class="small text-ink-3" th:text="${#lists.size(live.waiting())}">0</span></div>
+    <section class="card-c list-card">
+      <div class="empty" th:if="${#lists.isEmpty(live.waiting())}"><i class="bi bi-geo-alt"></i>No one is waiting.</div>
+      <ul class="people" th:unless="${#lists.isEmpty(live.waiting())}">
+        <li class="ride-line" th:each="r : ${live.waiting()}">
+          <div class="flex-grow-1 min-w-0">
+            <div class="fw-semibold text-body" th:text="${r.pickup()} + ' → ' + ${r.destination()}">route</div>
+            <div class="small text-ink-3"><a th:href="@{/admin/users/{id}(id=${r.userId()},tab='rides')}" th:text="${r.person()}">Name</a> · <span th:text="${r.seats()} + (${r.seats()} == 1 ? ' seat' : ' seats')">1 seat</span> · <span th:text="'asked ' + ${@fmt.ago(r.since())}">since</span></div>
+          </div>
+          <span class="pill" th:classappend="${#strings.toLowerCase(r.status().name())}" th:text="${@fmt.label(r.status())}">Open</span>
+          <form th:action="@{/admin/rides/requests/{id}/cancel(id=${r.id()})}" method="post" th:data-confirm="'Cancel this request?'"><button type="submit" class="btn btn-sm btn-ghost" th:text="'Cancel'">End</button></form>
+        </li>
+      </ul>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

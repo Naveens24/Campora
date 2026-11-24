@@ -24,12 +24,15 @@ public class AccountService {
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;
     private final OtpService otpService;
+    private final OwnerAccounts owners;
     private final Clock clock;
 
-    public AccountService(UserRepository users, PasswordEncoder passwordEncoder, OtpService otpService, Clock clock) {
+    public AccountService(UserRepository users, PasswordEncoder passwordEncoder, OtpService otpService,
+                          OwnerAccounts owners, Clock clock) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
         this.otpService = otpService;
+        this.owners = owners;
         this.clock = clock;
     }
 
@@ -37,7 +40,7 @@ public class AccountService {
     public UUID register(String firstName, String lastName, String rawEmail, String rawMobile, String rawPassword) {
         String email = normalizeEmail(rawEmail);
         String mobile = MobileNumbers.normalize(rawMobile);
-        claim(users.findByEmail(email), null, "An account with this email already exists. Please sign in.");
+        claimEmail(email, null);
         claimMobile(mobile, null);
         return users.save(new User(firstName.trim(), lastName.trim(), email, mobile,
                 passwordEncoder.encode(rawPassword))).getId();
@@ -50,7 +53,7 @@ public class AccountService {
             throw new BusinessException("Your account is already verified.");
         }
         String email = normalizeEmail(rawEmail);
-        claim(users.findByEmail(email), userId, "An account with this email already exists. Please sign in.");
+        claimEmail(email, userId);
         user.setPendingEmail(email);
     }
 
@@ -77,6 +80,19 @@ public class AccountService {
         }
         otpService.verify(OtpPurpose.VERIFY_EMAIL, user.getEmail(), code);
         user.markEmailVerified(clock.instant());
+        owners.adopt(user);
+    }
+
+    /** Replaces a temporary password set by an admin. */
+    public void replaceTemporaryPassword(UUID userId, String newPassword) {
+        User user = require(userId);
+        if (!user.isPasswordChangeRequired()) {
+            throw new BusinessException("Your password doesn't need changing.");
+        }
+        if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
+            throw new BusinessException("Choose a password different from the temporary one.");
+        }
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
     }
 
     /**
@@ -99,7 +115,7 @@ public class AccountService {
 
     private Optional<User> resettable(String email) {
         return users.findByEmail(email)
-                .filter(user -> user.isEmailVerified() && user.getStatus() != UserStatus.SUSPENDED);
+                .filter(user -> user.isEmailVerified() && user.getStatus().canSignIn());
     }
 
     /** Finds, links or creates the account for a Google identity whose email Google has verified. */
@@ -122,6 +138,7 @@ public class AccountService {
         User user = new User(clip(firstName, "Campora"), clip(lastName, ""), email, null, null);
         user.linkGoogle(subject);
         user.markEmailVerified(clock.instant());
+        owners.adopt(user);
         return users.save(user).getId();
     }
 
@@ -139,7 +156,13 @@ public class AccountService {
         user.setMobileNumber(mobile);
     }
 
-    private void claimMobile(String mobile, UUID claimant) {
+    /** Frees the address for {@code claimant}, or fails because a real account holds it. */
+    public void claimEmail(String email, UUID claimant) {
+        claim(users.findByEmail(email), claimant, "An account with this email already exists. Please sign in.");
+    }
+
+    /** Frees the number for {@code claimant}, or fails because a real account holds it. */
+    public void claimMobile(String mobile, UUID claimant) {
         claim(users.findByMobileNumber(mobile), claimant,
                 "An account with this mobile number already exists. Please sign in to that account.");
     }
@@ -157,7 +180,7 @@ public class AccountService {
         users.flush();
     }
 
-    private static String normalizeEmail(String raw) {
+    public static String normalizeEmail(String raw) {
         String email = raw == null ? "" : raw.trim().toLowerCase(Locale.ROOT);
         if (email.length() > 254 || !email.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")) {
             throw new BusinessException("Enter a valid email address.");

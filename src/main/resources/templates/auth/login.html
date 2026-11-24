@@ -16,6 +16,9 @@
       <div class="alert alert-danger flash" role="alert" th:if="${param.google != null}">
         <i class="bi bi-exclamation-triangle-fill"></i><div>Google sign-in didn't complete. Please try again.</div>
       </div>
+      <div class="alert alert-danger flash" role="alert" th:if="${param.locked != null}">
+        <i class="bi bi-hourglass-split"></i><div>Too many wrong passwords. Wait 15 minutes, or use “Forgot password?”.</div>
+      </div>
       <div class="alert alert-danger flash" role="alert" th:if="${param.suspended != null}">
         <i class="bi bi-slash-circle"></i><div>This account is suspended. Contact the transport office.</div>
       </div>

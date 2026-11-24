@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
 
-/** Tracks live sessions so a password reset can sign the account out on every device. */
+/** Tracks live sessions so a password reset or an admin can sign an account out on every device. */
 @Component
 public class ActiveSessions implements HttpSessionListener {
 

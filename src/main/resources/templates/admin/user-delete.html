@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Delete account')}"></head>
+<body class="role-admin app-page">
+<nav th:replace="~{fragments/layout :: nav}"></nav>
+<main class="container admin-shell">
+  <div th:replace="~{fragments/admin :: adminMenu}"></div>
+  <div class="admin-body">
+    <div th:replace="~{fragments/layout :: flash}"></div>
+    <a class="back-link" th:href="@{/admin/users/{id}(id=${u.id()},tab='access')}"><i class="bi bi-arrow-left"></i><span th:text="${u.fullName()}">Name</span></a>
+    <h1 class="app-title">Delete this account?</h1>
+    <section class="card-c form-card">
+      <p>You are deleting <strong th:text="${u.fullName()}">Name</strong><span th:if="${u.mobile() != null}" th:text="' (' + ${u.mobile()} + ')'"></span>. This can't be undone.</p>
+      <ul class="plain-list">
+        <li><i class="bi bi-x-circle"></i>Their name, email, phone number, password and Google link are erased.</li>
+        <li th:if="${u.driver() != null}"><i class="bi bi-x-circle"></i>Their vehicle number and usual area are erased.</li>
+        <li><i class="bi bi-x-circle"></i>Active rides are ended and they are signed out.</li>
+        <li><i class="bi bi-check-circle"></i>Past rides stay, shown as “Deleted user”.</li>
+        <li><i class="bi bi-check-circle"></i>They can sign up again with the same email and number.</li>
+      </ul>
+      <p class="hint">If you only want to stop them signing in, suspend the account instead.</p>
+      <form th:action="@{/admin/users/{id}/delete(id=${u.id()})}" method="post">
+        <label class="form-label" for="confirm">Type DELETE to confirm</label>
+        <div class="delete-row">
+          <input class="form-control" id="confirm" name="confirm" autocomplete="off" autocapitalize="characters" required>
+          <button type="submit" class="btn btn-danger-c">Delete account</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
+</body>
+</html>

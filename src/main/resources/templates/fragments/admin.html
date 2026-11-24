@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<!-- Shared pieces of the admin panel. On phones the menu is the tab bar in layout.html. -->
+<body>
+
+<div th:fragment="adminMenu" class="admin-menu" role="navigation" aria-label="Admin">
+    <a th:href="@{/admin}" th:classappend="${currentPath == '/admin'} ? 'active'"><i class="bi bi-grid-1x2"></i><span>Overview</span></a>
+    <a th:href="@{/admin/users}" th:classappend="${#strings.startsWith(currentPath, '/admin/users')} ? 'active'"><i class="bi bi-people"></i><span>Users</span></a>
+    <a th:href="@{/admin/rides}" th:classappend="${#strings.startsWith(currentPath, '/admin/rides')} ? 'active'"><i class="bi bi-signpost-split"></i><span>Rides</span></a>
+    <a th:href="@{/admin/stops}" th:classappend="${#strings.startsWith(currentPath, '/admin/stops') or #strings.startsWith(currentPath, '/admin/departments')} ? 'active'"><i class="bi bi-pin-map"></i><span>Stops</span><b class="menu-badge" th:if="${pendingSuggestions != null and pendingSuggestions > 0}" th:text="${pendingSuggestions}">1</b></a>
+    <a th:href="@{/admin/activity}" th:classappend="${#strings.startsWith(currentPath, '/admin/activity')} ? 'active'"><i class="bi bi-clock-history"></i><span>Activity</span></a>
+</div>
+
+<!-- One person in a list -->
+<a th:fragment="userRow(r)" class="u-row" th:href="@{/admin/users/{id}(id=${r.id()})}">
+  <span class="avatar" th:classappend="${r.role() != null} ? ${'is-' + #strings.toLowerCase(r.role().name())}" th:text="${#strings.substring(r.name(), 0, 1)}">A</span>
+  <span class="u-main">
+    <span class="u-name"><span th:text="${r.name()}">Name</span>
+      <span class="pill" th:classappend="${r.role() == null} ? '' : ${'role-' + #strings.toLowerCase(r.role().name())}"
+            th:text="${r.owner()} ? 'Owner' : (${r.role() == null} ? 'No role yet' : ${@fmt.label(r.role())})">Student</span></span>
+    <span class="u-sub" th:text="${r.contact()}">contact</span>
+    <span class="u-sub" th:if="${r.about() != null}" th:text="${r.about()}">about</span>
+  </span>
+  <span class="u-side">
+    <span class="pill rejected" th:if="${r.status().name() == 'SUSPENDED'}">Suspended</span>
+    <span class="pill in_trip" th:if="${r.status().name() == 'PENDING_VERIFICATION'}">Not verified</span>
+    <span class="pill rejected" th:if="${r.drivingBlocked()}">Driving blocked</span>
+    <span class="u-when" th:text="${r.lastLoginAt() != null} ? 'Signed in ' + ${@fmt.ago(r.lastLoginAt())} : 'Joined ' + ${@fmt.ago(r.joinedAt())}">when</span>
+  </span>
+  <i class="bi bi-chevron-right u-go"></i>
+</a>
+
+<!-- One line of the activity log -->
+<li th:fragment="actionRow(a, linked)">
+  <div class="flex-grow-1 min-w-0">
+    <div class="text-body"><span class="fw-semibold" th:text="${a.summary}">Did something</span><th:block th:if="${linked and a.targetName != null}">
+      · <a th:if="${a.targetId != null}" th:href="@{/admin/users/{id}(id=${a.targetId})}" th:text="${a.targetName}">Name</a><span th:if="${a.targetId == null}" th:text="${a.targetName}">Name</span></th:block></div>
+    <div class="small text-ink-3" th:if="${a.detail != null}" th:text="${a.detail}">detail</div>
+    <div class="small text-ink-3"><span th:text="${a.adminName}">Admin</span> · <span th:text="${@fmt.when(a.createdAt)}">time</span></div>
+  </div>
+</li>
+
+<!-- Previous / next for a Spring Data page; base already holds the other parameters -->
+<div th:fragment="pager(page, base)" class="pager" th:if="${page.totalPages > 1}">
+  <a class="btn btn-sm btn-ghost" th:classappend="${!page.hasPrevious()} ? 'disabled'" th:href="${base + 'page=' + page.number}"><i class="bi bi-arrow-left me-1"></i>Previous</a>
+  <span class="small text-ink-3" th:text="${'Page ' + (page.number + 1) + ' of ' + page.totalPages}">Page 1 of 2</span>
+  <a class="btn btn-sm btn-ghost" th:classappend="${!page.hasNext()} ? 'disabled'" th:href="${base + 'page=' + (page.number + 2)}">Next<i class="bi bi-arrow-right ms-1"></i></a>
+</div>
+
+</body>
+</html>

@@ -56,9 +56,6 @@
           <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver'} ? 'active'" th:href="@{/driver}"><i class="bi bi-broadcast me-1"></i>Demand</a></li>
           <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/driver/history'} ? 'active'" th:href="@{/driver/history}"><i class="bi bi-clock-history me-1"></i>Trips</a></li>
         </th:block>
-        <th:block th:if="${me.isAdmin()}">
-          <li class="nav-item"><a class="nav-link" th:classappend="${currentPath == '/admin'} ? 'active'" th:href="@{/admin}"><i class="bi bi-speedometer2 me-1"></i>Control room</a></li>
-        </th:block>
       </ul>
       <ul class="navbar-nav me-auto ms-lg-5 public-nav" th:if="${me == null}">
         <li class="nav-item"><a class="nav-link" th:href="@{/#companion}">Companion mode</a></li>
@@ -123,7 +120,7 @@
 
 <th:block th:fragment="scripts">
   <!-- Phone tab bar (a div: "layout :: nav" would match a second nav tag) -->
-  <div class="tabbar" role="navigation" aria-label="Sections" th:if="${me != null and me.ready() and !me.isAdmin()}">
+  <div class="tabbar" role="navigation" aria-label="Sections" th:if="${me != null and me.ready() and !me.passwordChangeRequired()}">
     <th:block th:if="${me.isStudent()}">
       <a th:href="@{/student}" th:classappend="${currentPath == '/student'} ? 'active'"><i class="bi bi-geo-alt"></i>Ride</a>
       <a th:href="@{/companion}" th:classappend="${currentPath == '/companion'} ? 'active'"><i class="bi bi-people"></i>Companion</a>
@@ -133,6 +130,13 @@
     <th:block th:if="${me.isDriver()}">
       <a th:href="@{/driver}" th:classappend="${currentPath == '/driver'} ? 'active'"><i class="bi bi-broadcast"></i>Demand</a>
       <a th:href="@{/driver/history}" th:classappend="${currentPath == '/driver/history'} ? 'active'"><i class="bi bi-clock-history"></i>Trips</a>
+    </th:block>
+    <th:block th:if="${me.isAdmin()}">
+      <a th:href="@{/admin}" th:classappend="${currentPath == '/admin'} ? 'active'"><i class="bi bi-grid-1x2"></i>Overview</a>
+      <a th:href="@{/admin/users}" th:classappend="${#strings.startsWith(currentPath, '/admin/users')} ? 'active'"><i class="bi bi-people"></i>Users</a>
+      <a th:href="@{/admin/rides}" th:classappend="${#strings.startsWith(currentPath, '/admin/rides')} ? 'active'"><i class="bi bi-signpost-split"></i>Rides</a>
+      <a th:href="@{/admin/stops}" th:classappend="${#strings.startsWith(currentPath, '/admin/stops') or #strings.startsWith(currentPath, '/admin/departments')} ? 'active'"><i class="bi bi-pin-map"></i>Stops<b class="menu-badge" th:if="${pendingSuggestions != null and pendingSuggestions > 0}" th:text="${pendingSuggestions}">1</b></a>
+      <a th:href="@{/admin/activity}" th:classappend="${#strings.startsWith(currentPath, '/admin/activity')} ? 'active'"><i class="bi bi-clock-history"></i>Activity</a>
     </th:block>
   </div>
   <script th:src="@{/webjars/bootstrap/5.3.3/dist/js/bootstrap.bundle.min.js}" defer></script>

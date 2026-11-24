@@ -10,6 +10,7 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | GET/POST | `/login` | Sign in (`mobile`, `password`) |
 | GET/POST | `/register` | Create account → signs in → `/verify` |
 | POST | `/logout` | Sign out |
+| GET/POST | `/account/password` | Replace a temporary password (signed in) |
 | GET | `/actuator/health` | Health check |
 
 ## Onboarding (signed in, not yet complete)
@@ -52,13 +53,25 @@ Post/Redirect/Get, so success and error messages arrive as flash messages.
 | GET | `/driver/history` | Past trips |
 
 ## Admin (`ROLE_ADMIN`)
+Admins manage students and drivers. Only owners (`ADMIN_EMAIL`) manage admins; nobody else can change an owner.
+
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/admin` | Stats, drivers, suggestions, network, departments |
-| POST | `/admin/drivers/{id}/verify` · `/revoke` | Unblock / block a driver |
+| GET | `/admin` | Overview |
+| GET | `/admin/users` (`q`, `show`, `page`) | Find accounts |
+| GET/POST | `/admin/users/new` | Open an account (`firstName`, `lastName`, `mobile`, `email`, `role`) |
+| GET | `/admin/users/{id}` (`tab=profile/rides/access/history`) | One account |
+| POST | `/admin/users/{id}/account` · `/student` · `/driver` | Correct details |
+| POST | `/admin/users/{id}/temporary-password` · `/verify` · `/sign-out` · `/disconnect-google` | Help them sign in |
+| POST | `/admin/users/{id}/role` (`role`) · `/driving` (`blocked`) · `/suspend` (`reason`) · `/reactivate` | Role and status |
+| POST | `/admin/users/{id}/clear-rides` | Free someone stuck in a ride |
+| GET/POST | `/admin/users/{id}/delete` (`confirm=DELETE`) | Erase an account |
+| GET | `/admin/rides` | Live rides and waiting requests |
+| POST | `/admin/rides/trips/{id}/end` · `/companion/{id}/end` · `/requests/{id}/cancel` | Close a ride |
+| GET | `/admin/stops` · `/admin/departments` · `/admin/activity` | Network and log |
 | POST | `/admin/suggestions/{id}/approve` (`type`) · `/reject` (`note`) | Review stop suggestions |
-| POST | `/admin/locations` · `/admin/locations/{id}/toggle` | Stop network |
-| POST | `/admin/departments` · `/admin/departments/{id}/toggle` | Departments |
+| POST | `/admin/stops` · `/admin/stops/{id}` · `/admin/stops/{id}/toggle` | Add, edit, pause stops |
+| POST | `/admin/departments` · `/admin/departments/{id}` · `/admin/departments/{id}/toggle` | Add, edit, pause departments |
 
 ## JSON API (`/api/v1`, session-authenticated)
 

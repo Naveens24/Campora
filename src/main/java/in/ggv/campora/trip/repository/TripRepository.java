@@ -38,6 +38,18 @@ public interface TripRepository extends JpaRepository<Trip, UUID> {
             """)
     List<Trip> findDriverHistory(@Param("driverId") UUID driverId, Pageable page);
 
+    /** Live driver trips, oldest first, for the admin panel. */
+    @Query("""
+            select t from Trip t
+              join fetch t.pickup
+              join fetch t.destination
+              join fetch t.driver d
+              join fetch d.user
+             where t.status in :statuses
+             order by t.createdAt asc
+            """)
+    List<Trip> findDriverTrips(@Param("statuses") Collection<TripStatus> statuses);
+
     boolean existsByDriverIdAndStatusIn(UUID driverId, Collection<TripStatus> statuses);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
